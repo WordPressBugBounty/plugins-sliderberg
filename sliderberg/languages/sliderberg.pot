@@ -1,0 +1,229 @@
+# Copyright (C) 2024 DotCamp
+# This file is distributed under the same license as the SliderBerg plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: SliderBerg 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/sliderberg\n"
+"POT-Creation-Date: 2024-03-21 12:00:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: src/block.json:7
+msgid "SliderBerg"
+msgstr ""
+
+#: src/block.json:8
+msgid "Add a beautiful slider to your content."
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:24
+msgid "Blocks Slider"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:25
+msgid "Create a slider with custom blocks"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:31
+msgid "WooCommerce Slider"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:32
+msgid "Showcase your products in a slider"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:38
+msgid "Posts Slider"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:39
+msgid "Display your posts in a beautiful slider"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:45
+msgid "More Coming Soon"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:46
+msgid "Stay tuned for more slider types"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:71
+msgid "Choose Slider Type"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:85
+msgid "Pro"
+msgstr ""
+
+#: src/components/slider/TypeSelector.tsx:90
+msgid "Coming Soon"
+msgstr ""
+
+#: src/components/slider/settings/SliderSettings.tsx:31
+msgid "Animation Settings"
+msgstr ""
+
+#: src/components/slider/settings/SliderSettings.tsx:36
+msgid "Autoplay Settings"
+msgstr ""
+
+#: src/components/slider/settings/SliderSettings.tsx:41
+msgid "Navigation Settings"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:17
+msgid "Transition Effect"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:20
+msgid "Slide"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:21
+msgid "Fade"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:22
+msgid "Zoom"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:25
+msgid "Transition Duration"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:30
+msgid "Duration of the transition in milliseconds"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:32
+msgid "Transition Easing"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:35
+msgid "Ease"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:36
+msgid "Ease In"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:37
+msgid "Ease Out"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:38
+msgid "Ease In Out"
+msgstr ""
+
+#: src/components/slider/settings/AnimationSettings.tsx:39
+msgid "Linear"
+msgstr ""
+
+#: src/components/slider/settings/AutoplaySettings.tsx:17
+msgid "Enable Autoplay"
+msgstr ""
+
+#: src/components/slider/settings/AutoplaySettings.tsx:24
+msgid "Autoplay Speed (ms)"
+msgstr ""
+
+#: src/components/slider/settings/AutoplaySettings.tsx:31
+msgid "Pause on Hover"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:17
+msgid "Navigation Type"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:20
+msgid "Split Arrows"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:21
+msgid "Top Arrows"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:22
+msgid "Bottom Arrows"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:27
+msgid "Placement"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:30
+msgid "Overlay"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:31
+msgid "Outside Content"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:37
+msgid "Shape"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:40
+msgid "Circle"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:41
+msgid "Square"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:47
+msgid "Size"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:50
+msgid "Small"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:51
+msgid "Medium"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:52
+msgid "Large"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:57
+msgid "Arrow Color"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:64
+msgid "Background Color"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:72
+msgid "Opacity"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:79
+msgid "Vertical Position"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:85
+msgid "Adjust the vertical position of the navigation arrows (in pixels)"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:89
+msgid "Horizontal Position"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:95
+msgid "Adjust the horizontal position of the navigation arrows (in pixels)"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:100
+msgid "Dot Color"
+msgstr ""
+
+#: src/components/slider/settings/NavigationSettings.tsx:107
+msgid "Active Dot Color"
+msgstr "" 

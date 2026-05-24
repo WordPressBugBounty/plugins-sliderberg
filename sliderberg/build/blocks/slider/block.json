@@ -1,0 +1,175 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "sliderberg/sliderberg",
+  "version": "1.0.0",
+  "title": "SliderBerg",
+  "category": "widgets",
+  "icon": "slides",
+  "description": "Add a beautiful slider to your content.",
+  "providesContext": {
+    "sliderberg/minHeight": "minHeight"
+  },
+  "supports": {
+    "html": false,
+    "align": [
+      "wide",
+      "full"
+    ],
+    "spacing": {
+      "margin": true,
+      "padding": true
+    }
+  },
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "full"
+    },
+    "type": {
+      "type": "string",
+      "default": "blocks"
+    },
+    "autoplay": {
+      "type": "boolean",
+      "default": false
+    },
+    "autoplaySpeed": {
+      "type": "number",
+      "default": 5000
+    },
+    "pauseOnHover": {
+      "type": "boolean",
+      "default": true
+    },
+    "transitionEffect": {
+      "type": "string",
+      "default": "slide"
+    },
+    "transitionDuration": {
+      "type": "number",
+      "default": 500
+    },
+    "transitionEasing": {
+      "type": "string",
+      "default": "ease"
+    },
+    "navigationType": {
+      "type": "string",
+      "default": "bottom"
+    },
+    "navigationPlacement": {
+      "type": "string",
+      "default": "overlay"
+    },
+    "navigationShape": {
+      "type": "string",
+      "default": "circle"
+    },
+    "navigationSize": {
+      "type": "string",
+      "default": "medium"
+    },
+    "navigationColor": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "navigationBgColor": {
+      "type": "string",
+      "default": "rgba(0, 0, 0, 0.5)"
+    },
+    "navigationOpacity": {
+      "type": "number",
+      "default": 1
+    },
+    "navigationVerticalPosition": {
+      "type": "number",
+      "default": 20
+    },
+    "navigationHorizontalPosition": {
+      "type": "number",
+      "default": 20
+    },
+    "dotColor": {
+      "type": "string",
+      "default": "#6c757d"
+    },
+    "dotActiveColor": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "hideDots": {
+      "type": "boolean",
+      "default": false
+    },
+    "hideNavigation": {
+      "type": "boolean",
+      "default": false
+    },
+    "widthPreset": {
+      "type": "string",
+      "default": "full"
+    },
+    "customWidth": {
+      "type": "string",
+      "default": ""
+    },
+    "widthUnit": {
+      "type": "string",
+      "default": "px"
+    },
+    "isCarouselMode": {
+      "type": "boolean",
+      "default": false
+    },
+    "slidesToShow": {
+      "type": "number",
+      "default": 3
+    },
+    "slidesToScroll": {
+      "type": "number",
+      "default": 1
+    },
+    "slideSpacing": {
+      "type": "number",
+      "default": 20
+    },
+    "infiniteLoop": {
+      "type": "boolean",
+      "default": true
+    },
+    "tabletSlidesToShow": {
+      "type": "number",
+      "default": 2
+    },
+    "tabletSlidesToScroll": {
+      "type": "number",
+      "default": 1
+    },
+    "tabletSlideSpacing": {
+      "type": "number",
+      "default": 15
+    },
+    "mobileSlidesToShow": {
+      "type": "number",
+      "default": 1
+    },
+    "mobileSlidesToScroll": {
+      "type": "number",
+      "default": 1
+    },
+    "mobileSlideSpacing": {
+      "type": "number",
+      "default": 10
+    },
+    "minHeight": {
+      "type": "number",
+      "default": 400
+    }
+  },
+  "textdomain": "sliderberg",
+  "editorScript": "sliderberg-editor",
+  "editorStyle": "sliderberg-editor",
+  "style": "sliderberg-style",
+  "viewScript": "sliderberg-view"
+}

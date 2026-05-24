@@ -1,0 +1,978 @@
+.wp-block-sliderberg-sliderberg {
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  position: relative;
+}
+
+/* Editor wrapper class for better control */
+.sliderberg-editor-wrapper {
+  position: relative;
+}
+
+/* Full width handling in editor - Trust WordPress alignment, prevent overflow */
+.wp-block-sliderberg-sliderberg[data-align="full"],
+.wp-block-sliderberg-sliderberg.alignfull {
+  overflow-x: clip; /* Prevent horizontal scrolling */
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* Fallback for custom is-full-width class */
+.sliderberg-editor-wrapper.is-full-width {
+  overflow-x: clip; /* Prevent horizontal scrolling */
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* Ensure all children in full width have proper styling */
+.wp-block-sliderberg-sliderberg[data-align="full"] .sliderberg-container,
+.wp-block-sliderberg-sliderberg[data-align="full"] .sliderberg-slides,
+.wp-block-sliderberg-sliderberg.alignfull .sliderberg-container,
+.wp-block-sliderberg-sliderberg.alignfull .sliderberg-slides,
+.sliderberg-editor-wrapper.is-full-width .sliderberg-container,
+.sliderberg-editor-wrapper.is-full-width .sliderberg-slides {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.wp-block-sliderberg-sliderberg[data-align="full"] .sliderberg-content,
+.wp-block-sliderberg-sliderberg.alignfull .sliderberg-content,
+.sliderberg-editor-wrapper.is-full-width .sliderberg-content {
+  padding: 0 !important;
+}
+
+/* Remove extra margin/padding for all children in full width */
+.wp-block-sliderberg-sliderberg[data-align="full"] *,
+.wp-block-sliderberg-sliderberg.alignfull *,
+.sliderberg-editor-wrapper.is-full-width * {
+  box-sizing: border-box;
+}
+
+/* Wide alignment */
+.wp-block-sliderberg-sliderberg.alignwide,
+.wp-block-sliderberg-sliderberg[data-width-preset="wide"] {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Custom width */
+.wp-block-sliderberg-sliderberg[data-width-preset="custom"],
+.sliderberg-editor-wrapper[data-width-preset="custom"] {
+  width: var(--sliderberg-custom-width) !important;
+  max-width: var(--sliderberg-custom-width) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Ensure inner containers do not override custom width */
+.wp-block-sliderberg-sliderberg[data-width-preset="custom"]
+  .sliderberg-container,
+.wp-block-sliderberg-sliderberg[data-width-preset="custom"] .sliderberg-slides,
+.wp-block-sliderberg-sliderberg[data-width-preset="custom"]
+  .sliderberg-slides-container,
+.sliderberg-editor-wrapper[data-width-preset="custom"] .sliderberg-container,
+.sliderberg-editor-wrapper[data-width-preset="custom"] .sliderberg-slides,
+.sliderberg-editor-wrapper[data-width-preset="custom"]
+  .sliderberg-slides-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.wp-block-sliderberg-sliderberg[data-width-preset="custom"]
+  .sliderberg-container,
+.sliderberg-editor-wrapper[data-width-preset="custom"] .sliderberg-container {
+  width: var(--sliderberg-custom-width) !important;
+  max-width: var(--sliderberg-custom-width) !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sliderberg-editor-placeholder {
+  text-align: center;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.sliderberg-type-selector {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.sliderberg-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.5rem;
+  color: #1e1e1e;
+}
+
+.sliderberg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.sliderberg-type-card {
+  background: #fff;
+  border: 1px solid #e2e4e7;
+  border-radius: 8px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.sliderberg-type-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sliderberg-type-card.is-pro {
+  opacity: 0.8;
+}
+
+.sliderberg-type-card.is-coming-soon {
+  background: #f8f9fa;
+  cursor: default;
+}
+
+.sliderberg-type-card.is-coming-soon:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.sliderberg-type-icon {
+  width: 48px;
+  height: 48px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.sliderberg-type-icon svg {
+  width: 24px;
+  height: 24px;
+  color: #1e1e1e;
+}
+
+.sliderberg-pro-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #007cba;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sliderberg-coming-soon-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #6c757d;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.sliderberg-pro-badge svg {
+  width: 12px;
+  height: 12px;
+}
+
+.sliderberg-type-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  color: #1e1e1e;
+}
+
+.sliderberg-type-description {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Slider Content Styles */
+.sliderberg-content {
+  position: relative;
+  padding: 1rem;
+}
+
+/* Remove padding for full width content */
+.sliderberg-editor-wrapper.is-full-width .sliderberg-content,
+.wp-block-sliderberg-sliderberg.alignfull .sliderberg-content,
+.wp-block-sliderberg-sliderberg[data-width-preset="full"] .sliderberg-content {
+  padding: 1rem 0;
+}
+
+.sliderberg-action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sliderberg-add-slide,
+.sliderberg-delete-slide {
+  margin: 0;
+}
+
+.sliderberg-navigation {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10;
+}
+
+.sliderberg-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sliderberg-slides {
+  overflow: hidden;
+  position: relative;
+}
+
+.sliderberg-slides-container {
+  display: flex;
+  align-items: flex-start; /* Allow slides to have different heights */
+  transition: transform 0.3s ease;
+  width: 100%;
+}
+
+/* Regular slider mode - non-carousel */
+.sliderberg-slides:not(.sliderberg-carousel-mode)
+  .sliderberg-slides-container
+  > * {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 100%;
+}
+
+/* Slide Navigation */
+.sliderberg-nav-button {
+  padding: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.sliderberg-nav-button:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.05);
+}
+
+.sliderberg-nav-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sliderberg-slide-indicators {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sliderberg-slide-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sliderberg-slide-indicator:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.2);
+}
+
+.sliderberg-slide-indicator.active {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.2);
+}
+
+/* Editor Carousel Mode Styles - Simplified Approach */
+.sliderberg-carousel-mode .sliderberg-slides {
+  overflow: hidden;
+}
+
+.sliderberg-carousel-mode .sliderberg-slides-container {
+  position: relative;
+  width: 100%;
+  /* Ensure CSS custom properties are inherited */
+  --sliderberg-slides-to-show: var(--sliderberg-slides-to-show, 3);
+  --sliderberg-slide-spacing: var(--sliderberg-slide-spacing, 20px);
+}
+
+/* Target the WordPress block editor layout directly */
+.sliderberg-carousel-mode
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: flex-start !important; /* Allow slides to have different heights */
+  width: calc(
+    100% * var(--sliderberg-slides-to-show, 3) +
+      (var(--sliderberg-slides-to-show, 3) - 1) *
+      var(--sliderberg-slide-spacing, 20px)
+  ) !important;
+  gap: var(--sliderberg-slide-spacing, 20px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Each slide block in carousel mode */
+.sliderberg-carousel-mode
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout
+  > .block-editor-block-list__block {
+  min-width: calc(
+    (
+        100% - (var(--sliderberg-slides-to-show, 3) - 1) *
+          var(--sliderberg-slide-spacing, 20px)
+      ) / var(--sliderberg-slides-to-show, 3)
+  ) !important;
+  margin: 0 !important;
+  position: relative !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Active slide indicator in carousel mode */
+.sliderberg-carousel-mode
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout
+  > .block-editor-block-list__block.active::before {
+  content: "✓ Active" !important;
+  position: absolute !important;
+  top: -8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #007cba !important;
+  color: white !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  z-index: 1000 !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Enhanced active slide styling */
+.sliderberg-carousel-mode
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout
+  > .block-editor-block-list__block.active {
+  box-shadow:
+    0 0 0 3px #007cba,
+    0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  transform: scale(1.02) !important;
+}
+
+/* Hover effect for non-active slides */
+.sliderberg-carousel-mode
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout
+  > .block-editor-block-list__block:not(.active):hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  transform: scale(1.01) !important;
+}
+
+/* Ensure slide content maintains its normal layout */
+.sliderberg-carousel-mode .sliderberg-slide {
+  height: auto !important;
+}
+
+/* Fix slide content positioning in carousel mode */
+.sliderberg-carousel-mode .block-editor-block-list__block {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.sliderberg-carousel-mode .sliderberg-slide {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.sliderberg-carousel-mode .sliderberg-slide-content {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Ensure innerblocks within slides maintain vertical layout */
+.sliderberg-carousel-mode .sliderberg-slide .block-editor-inner-blocks {
+  display: block !important;
+  width: 100% !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-slide
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+}
+
+/* Preserve content positioning in carousel mode - Override carousel styles */
+.sliderberg-carousel-mode
+  .sliderberg-content-position-top-left
+  .sliderberg-slide-content {
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 4rem !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-top-left
+  .sliderberg-slide-content
+  .block-editor-inner-blocks {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-top-left
+  .sliderberg-slide-content
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  width: 100% !important;
+  align-items: flex-start !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-top-center
+  .sliderberg-slide-content {
+  justify-content: flex-start !important;
+  align-items: center !important;
+  text-align: center !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-top-center
+  .sliderberg-slide-content
+  .block-editor-inner-blocks {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-top-center
+  .sliderberg-slide-content
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  width: 100% !important;
+  align-items: center !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-top-right
+  .sliderberg-slide-content {
+  justify-content: flex-start !important;
+  align-items: flex-end !important;
+  text-align: right !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 4rem !important;
+  padding-right: 0 !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-top-right
+  .sliderberg-slide-content
+  .block-editor-inner-blocks {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: flex-end !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-top-right
+  .sliderberg-slide-content
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  width: 100% !important;
+  align-items: flex-end !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-center-left
+  .sliderberg-slide-content {
+  justify-content: center !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 4rem !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-center-left
+  .sliderberg-slide-content
+  .block-editor-inner-blocks {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-center-left
+  .sliderberg-slide-content
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  width: 100% !important;
+  align-items: flex-start !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-center-center
+  .sliderberg-slide-content {
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-center-center
+  .sliderberg-slide-content
+  .block-editor-inner-blocks {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-center-center
+  .sliderberg-slide-content
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  width: 100% !important;
+  align-items: center !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-center-right
+  .sliderberg-slide-content {
+  justify-content: center !important;
+  align-items: flex-end !important;
+  text-align: right !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 4rem !important;
+  padding-right: 0 !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-center-right
+  .sliderberg-slide-content
+  .block-editor-inner-blocks {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-end !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-center-right
+  .sliderberg-slide-content
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  width: 100% !important;
+  align-items: flex-end !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-bottom-left
+  .sliderberg-slide-content {
+  justify-content: flex-end !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 4rem !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-bottom-left
+  .sliderberg-slide-content
+  .block-editor-inner-blocks {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  align-items: flex-start !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-bottom-left
+  .sliderberg-slide-content
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  width: 100% !important;
+  align-items: flex-start !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-bottom-center
+  .sliderberg-slide-content {
+  justify-content: flex-end !important;
+  align-items: center !important;
+  text-align: center !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-bottom-center
+  .sliderberg-slide-content
+  .block-editor-inner-blocks {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-bottom-center
+  .sliderberg-slide-content
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  width: 100% !important;
+  align-items: center !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-bottom-right
+  .sliderberg-slide-content {
+  justify-content: flex-end !important;
+  align-items: flex-end !important;
+  text-align: right !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: 4rem !important;
+  padding-right: 0 !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-bottom-right
+  .sliderberg-slide-content
+  .block-editor-inner-blocks {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  align-items: flex-end !important;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-content-position-bottom-right
+  .sliderberg-slide-content
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  width: 100% !important;
+  align-items: flex-end !important;
+}
+
+/* Responsive carousel behavior */
+@media (max-width: 1200px) {
+  .sliderberg-carousel-mode
+    .block-editor-inner-blocks
+    .block-editor-block-list__layout
+    > .block-editor-block-list__block {
+    flex: 0 0 calc(100% / min(var(--sliderberg-slides-to-show, 3), 2)) !important;
+    min-width: calc(
+      100% / min(var(--sliderberg-slides-to-show, 3), 2)
+    ) !important;
+    width: calc(100% / min(var(--sliderberg-slides-to-show, 3), 2)) !important;
+    max-width: calc(
+      100% / min(var(--sliderberg-slides-to-show, 3), 2)
+    ) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .sliderberg-carousel-mode
+    .block-editor-inner-blocks
+    .block-editor-block-list__layout
+    > .block-editor-block-list__block {
+    flex: 0 0 100% !important;
+    min-width: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Carousel mode scoping */
+.sliderberg-carousel-mode .sliderberg-slides-container[data-slider-id] {
+  overflow: hidden;
+  position: relative;
+}
+
+.sliderberg-carousel-mode
+  .sliderberg-slides-container[data-slider-id]
+  .block-editor-inner-blocks
+  .block-editor-block-list__layout {
+  display: flex;
+  flex-wrap: nowrap;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+/* Ensure each slider's carousel is independent */
+.sliderberg-carousel-mode
+  .sliderberg-slides-container[data-slider-id]
+  ~ .sliderberg-slides-container[data-slider-id] {
+  margin-top: 20px;
+}
+
+/* Ensure navigation is properly scoped */
+.sliderberg-carousel-mode .sliderberg-navigation[data-slider-id],
+.sliderberg-carousel-mode .sliderberg-navigation-bar[data-slider-id] {
+  position: relative;
+  z-index: 10;
+}
+
+/* Ensure navigation buttons are properly scoped */
+.sliderberg-carousel-mode
+  .sliderberg-navigation[data-slider-id]
+  .sliderberg-nav-button,
+.sliderberg-carousel-mode
+  .sliderberg-navigation-bar[data-slider-id]
+  .sliderberg-nav-button {
+  position: relative;
+  z-index: 11;
+}
+
+/* LEGACY: Overlay navigation styles (only used for non-editor or non-overlay modes) */
+/* These styles are kept for backwards compatibility but are bypassed by the editor direct mode */
+.sliderberg-navigation[data-placement="overlay"]:not(
+    [data-editor-context="true"]
+  ) {
+  pointer-events: none !important;
+  background: transparent !important;
+}
+
+.sliderberg-navigation[data-placement="overlay"]:not(
+    [data-editor-context="true"]
+  )
+  .sliderberg-nav-controls {
+  pointer-events: none !important;
+  background: transparent !important;
+}
+
+.sliderberg-navigation[data-placement="overlay"]:not(
+    [data-editor-context="true"]
+  )
+  .sliderberg-nav-button {
+  pointer-events: auto !important;
+  position: absolute !important;
+  z-index: 15 !important;
+  padding: 8px !important;
+  margin: 0 !important;
+}
+
+/* Allow original positioning logic to work - don't override positioning */
+/* The SliderNavigation component handles positioning via inline styles using navigationHorizontalPosition/navigationVerticalPosition */
+
+/* Ensure slide indicators don't block clicks either */
+.sliderberg-navigation[data-placement="overlay"] .sliderberg-slide-indicators {
+  pointer-events: auto !important;
+  position: absolute !important;
+  bottom: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 15 !important;
+  background: transparent !important;
+}
+
+/* Make sure slide content area is fully clickable in editor */
+.sliderberg-slides-container {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Ensure slide blocks themselves are interactive */
+.sliderberg-slides-container .block-editor-block-list__block {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* Editor-specific: Direct button positioning (no overlay container) */
+.sliderberg-nav-button.sliderberg-editor-direct {
+  position: absolute !important;
+  z-index: 15 !important;
+  top: 50% !important;
+  pointer-events: auto !important;
+}
+
+/* Position buttons using CSS custom properties for user settings */
+.sliderberg-nav-button.sliderberg-editor-direct.sliderberg-prev {
+  left: var(--sliderberg-nav-horizontal-position, 20px) !important;
+  transform: translateY(
+    calc(-50% + var(--sliderberg-nav-vertical-position, 20px))
+  ) !important;
+}
+
+.sliderberg-nav-button.sliderberg-editor-direct.sliderberg-next {
+  right: var(--sliderberg-nav-horizontal-position, 20px) !important;
+  transform: translateY(
+    calc(-50% + var(--sliderberg-nav-vertical-position, 20px))
+  ) !important;
+}
+
+/* Button sizes for editor direct mode */
+.sliderberg-nav-button.sliderberg-editor-direct[data-size="small"] {
+  padding: 6px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+
+.sliderberg-nav-button.sliderberg-editor-direct[data-size="medium"] {
+  padding: 8px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+}
+
+.sliderberg-nav-button.sliderberg-editor-direct[data-size="large"] {
+  padding: 12px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+}
+
+/* Button shapes for editor direct mode */
+.sliderberg-nav-button.sliderberg-editor-direct[data-shape="circle"] {
+  border-radius: 50% !important;
+}
+
+.sliderberg-nav-button.sliderberg-editor-direct[data-shape="square"] {
+  border-radius: 4px !important;
+}
+
+/* Ensure buttons appear above slide content but are small enough not to interfere */
+.sliderberg-nav-button.sliderberg-editor-direct {
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  backdrop-filter: blur(4px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.sliderberg-nav-button.sliderberg-editor-direct:hover {
+  transform: translateY(
+      calc(-50% + var(--sliderberg-nav-vertical-position, 20px))
+    )
+    scale(1.05) !important;
+}
+
+/* Legacy overlay styles for non-editor or non-overlay modes */
+.sliderberg-navigation[data-placement="overlay"]
+  .sliderberg-nav-button[data-size="small"] {
+  padding: 4px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+
+.sliderberg-navigation[data-placement="overlay"]
+  .sliderberg-nav-button[data-size="medium"] {
+  padding: 6px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+}
+
+.sliderberg-navigation[data-placement="overlay"]
+  .sliderberg-nav-button[data-size="large"] {
+  padding: 8px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+}

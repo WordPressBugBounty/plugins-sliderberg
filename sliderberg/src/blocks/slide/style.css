@@ -1,0 +1,142 @@
+/* Slide Block Frontend Styles - Rewritten
+ * Simplified from 357 lines to <150 lines
+ * Uses CSS Grid for positioning without affecting nested blocks
+ */
+
+/* === SLIDE CONTAINER === */
+.sliderberg-slide {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    /* CSS Grid for content positioning */
+    display: grid;
+    grid-template-areas: "content";
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    min-height: var(--slide-min-height, 400px);
+}
+
+/* Show borders */
+.sliderberg-slide.has-border {
+    overflow: visible;
+}
+
+/* === OVERLAY === */
+.sliderberg-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    grid-area: content;
+}
+
+/* === CONTENT POSITIONING === */
+.sliderberg-slide-content {
+    grid-area: content;
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+    max-width: min(90%, 1200px);
+    width: auto;
+    box-sizing: border-box;
+
+    /* Normal block flow - NO flexbox */
+    display: block;
+}
+
+/* Grid positioning for content */
+.sliderberg-content-position-top-left .sliderberg-slide-content {
+    place-self: start start;
+}
+
+.sliderberg-content-position-top-center .sliderberg-slide-content {
+    place-self: start center;
+}
+
+.sliderberg-content-position-top-right .sliderberg-slide-content {
+    place-self: start end;
+}
+
+.sliderberg-content-position-center-left .sliderberg-slide-content {
+    place-self: center start;
+}
+
+.sliderberg-content-position-center-center .sliderberg-slide-content {
+    place-self: center center;
+}
+
+.sliderberg-content-position-center-right .sliderberg-slide-content {
+    place-self: center end;
+}
+
+.sliderberg-content-position-bottom-left .sliderberg-slide-content {
+    place-self: end start;
+}
+
+.sliderberg-content-position-bottom-center .sliderberg-slide-content {
+    place-self: end center;
+}
+
+.sliderberg-content-position-bottom-right .sliderberg-slide-content {
+    place-self: end end;
+}
+
+/* === INNER WRAPPER === */
+.sliderberg-slide-inner {
+    width: 100%;
+    max-width: 100%;
+    /* Let child blocks render naturally */
+}
+
+/* === FIXED BACKGROUND === */
+.sliderberg-fixed-background {
+    background-attachment: fixed !important;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 782px) {
+    .sliderberg-fixed-background {
+        background-attachment: scroll !important;
+    }
+
+    .sliderberg-slide-content {
+        padding: 1rem;
+        max-width: 100%;
+    }
+}
+
+/* === CORE BLOCK COMPATIBILITY === */
+/* Minimal rules - blocks work naturally with grid */
+
+.sliderberg-slide .aligncenter {
+    display: table;
+    margin-inline: auto;
+}
+
+.sliderberg-slide .alignleft {
+    float: left;
+    margin-right: 1em;
+}
+
+.sliderberg-slide .alignright {
+    float: right;
+    margin-left: 1em;
+}
+
+/* === PLACEHOLDER UI (Editor Only) === */
+.sliderberg-slide-placeholder {
+    border: 2px dashed #d1d5db;
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* === END === */
+/* Total: ~140 lines (down from 357) */

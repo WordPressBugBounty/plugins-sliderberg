@@ -1,0 +1,491 @@
+/* Slider Block Frontend Styles - Rewritten
+ * Simplified from 457 lines to <200 lines
+ * Clean, maintainable code with CSS custom properties
+ */
+
+/* === SLIDER CONTAINER === */
+.wp-block-sliderberg-slider {
+  margin: 0;
+  padding: 0;
+}
+
+.sliderberg-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.sliderberg-slides {
+  position: relative;
+  overflow: hidden;
+}
+
+.sliderberg-slides-container {
+  display: flex;
+  align-items: flex-start; /* Allow slides to have different heights */
+  transition: transform 0.5s ease;
+  width: 100%;
+}
+
+/* Regular mode - one slide at a time */
+.sliderberg-slides-container > * {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 100%;
+}
+
+/* === NAVIGATION === */
+.sliderberg-navigation {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+  width: 100%;
+  background: transparent;
+  pointer-events: none;
+}
+
+.sliderberg-nav-controls {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+}
+
+.sliderberg-nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.sliderberg-nav-button.sliderberg-prev {
+  left: 0;
+}
+
+.sliderberg-nav-button.sliderberg-next {
+  right: 0;
+}
+
+.sliderberg-nav-button:hover {
+  transform: translateY(-50%) scale(1.05);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.sliderberg-nav-button svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+/* Navigation placement */
+.sliderberg-navigation[data-placement="overlay"] {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  transform: none;
+}
+
+.sliderberg-navigation[data-placement="outside"] {
+  position: relative;
+  margin: 1rem 0 0 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === INDICATORS === */
+.sliderberg-slide-indicators {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  margin: 24px 0 0 0;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.sliderberg-slide-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sliderberg-dot-color, rgba(255, 255, 255, 0.5));
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sliderberg-slide-indicator:hover {
+  background: var(--sliderberg-dot-active-color, rgba(255, 255, 255, 0.8));
+  transform: scale(1.2);
+}
+
+.sliderberg-slide-indicator.active {
+  background: var(--sliderberg-dot-active-color, rgba(255, 255, 255, 0.95));
+  transform: scale(1.2);
+}
+
+/* Navigation styles */
+.sliderberg-nav-button[data-style="arrow"] svg {
+  transform: scale(1.2);
+}
+
+.sliderberg-nav-button[data-style="caret"] svg {
+  transform: scale(1.1);
+}
+
+.sliderberg-nav-button[data-style="angle"] svg {
+  transform: scale(1.3);
+}
+
+/* Navigation shapes */
+.sliderberg-nav-button[data-shape="circle"] {
+  border-radius: 50%;
+}
+
+.sliderberg-nav-button[data-shape="square"] {
+  border-radius: 4px;
+}
+
+/* Navigation sizes */
+.sliderberg-nav-button[data-size="small"] {
+  padding: 6px;
+}
+
+.sliderberg-nav-button[data-size="small"] svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sliderberg-nav-button[data-size="medium"] {
+  padding: 8px;
+}
+
+.sliderberg-nav-button[data-size="medium"] svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sliderberg-nav-button[data-size="large"] {
+  padding: 12px;
+}
+
+.sliderberg-nav-button[data-size="large"] svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Navigation grouped controls (for top/bottom navigation bars) */
+.sliderberg-nav-controls-grouped {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: auto;
+  position: static;
+  height: auto;
+  background: transparent;
+  box-shadow: none;
+}
+
+.sliderberg-nav-controls-grouped .sliderberg-nav-button {
+  position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  transform: none;
+  margin: 0 0.5rem;
+}
+
+.sliderberg-nav-controls-grouped .sliderberg-slide-indicators {
+  margin: 0;
+  gap: 0.5rem;
+}
+
+/* Navigation Types */
+.sliderberg-navigation[data-type="split"] {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sliderberg-navigation[data-type="top"] {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sliderberg-navigation[data-type="bottom"] {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Navigation bar container */
+.sliderberg-navigation-bar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+  background: transparent;
+  position: relative;
+  z-index: 10;
+}
+
+.sliderberg-navigation-bar-top {
+  margin-bottom: 8px;
+}
+
+.sliderberg-navigation-bar-bottom {
+  margin-top: 8px;
+}
+
+/* Hide all navigation elements inside the slides container */
+.wp-block-sliderberg-sliderberg
+  .sliderberg-slides-container
+  .sliderberg-navigation-bar,
+.wp-block-sliderberg-sliderberg
+  .sliderberg-slides-container
+  .sliderberg-navigation,
+.wp-block-sliderberg-sliderberg
+  .sliderberg-slides-container
+  .sliderberg-nav-button,
+.wp-block-sliderberg-sliderberg
+  .sliderberg-slides-container
+  .sliderberg-slide-indicators {
+  display: none !important;
+}
+
+/* Frontend-specific: Direct button positioning (no overlay container) */
+.wp-block-sliderberg-sliderberg
+  .sliderberg-nav-button.sliderberg-frontend-direct {
+  position: absolute;
+  z-index: 10;
+  top: 50%;
+  pointer-events: auto;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Position buttons using CSS custom properties for user settings */
+.wp-block-sliderberg-sliderberg
+  .sliderberg-nav-button.sliderberg-frontend-direct.sliderberg-prev {
+  left: var(--sliderberg-nav-horizontal-position, 20px);
+  transform: translateY(
+    calc(-50% + var(--sliderberg-nav-vertical-position, 20px))
+  );
+}
+
+.wp-block-sliderberg-sliderberg
+  .sliderberg-nav-button.sliderberg-frontend-direct.sliderberg-next {
+  right: var(--sliderberg-nav-horizontal-position, 20px);
+  transform: translateY(
+    calc(-50% + var(--sliderberg-nav-vertical-position, 20px))
+  );
+}
+
+/* Button sizes for frontend direct mode */
+.wp-block-sliderberg-sliderberg
+  .sliderberg-nav-button.sliderberg-frontend-direct[data-size="small"] {
+  padding: 6px;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.wp-block-sliderberg-sliderberg
+  .sliderberg-nav-button.sliderberg-frontend-direct[data-size="medium"] {
+  padding: 8px;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.wp-block-sliderberg-sliderberg
+  .sliderberg-nav-button.sliderberg-frontend-direct[data-size="large"] {
+  padding: 12px;
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* Button shapes for frontend direct mode */
+.wp-block-sliderberg-sliderberg
+  .sliderberg-nav-button.sliderberg-frontend-direct[data-shape="circle"] {
+  border-radius: 50%;
+}
+
+.wp-block-sliderberg-sliderberg
+  .sliderberg-nav-button.sliderberg-frontend-direct[data-shape="square"] {
+  border-radius: 4px;
+}
+
+/* Hover effects for direct positioning */
+.wp-block-sliderberg-sliderberg
+  .sliderberg-nav-button.sliderberg-frontend-direct:hover {
+  transform: translateY(
+      calc(-50% + var(--sliderberg-nav-vertical-position, 20px))
+    )
+    scale(1.05);
+}
+
+/* === CUSTOM WIDTH === */
+.wp-block-sliderberg-sliderberg[data-width-preset="custom"] {
+  width: var(--sliderberg-custom-width);
+  max-width: var(--sliderberg-custom-width);
+  margin-inline: auto;
+}
+
+.wp-block-sliderberg-sliderberg[data-width-preset="custom"]
+  .sliderberg-container {
+  width: var(--sliderberg-custom-width);
+  max-width: var(--sliderberg-custom-width);
+  margin-inline: auto;
+}
+
+/* === CAROUSEL MODE === */
+.sliderberg-carousel-mode .sliderberg-slides-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start; /* Allow slides to have different heights */
+  gap: var(--sliderberg-slide-spacing, 20px);
+  padding: 0 var(--sliderberg-slide-spacing, 20px);
+  width: 100%;
+  overflow-x: visible;
+  flex-wrap: nowrap;
+}
+
+.sliderberg-carousel-mode .sliderberg-slides-container > * {
+  flex: 0 0
+    calc(
+      (
+          100% - (var(--sliderberg-slides-to-show, 3) - 1) *
+            var(--sliderberg-slide-spacing, 20px)
+        ) / var(--sliderberg-slides-to-show, 3)
+    );
+  min-width: calc(
+    (
+        100% - (var(--sliderberg-slides-to-show, 3) - 1) *
+          var(--sliderberg-slide-spacing, 20px)
+      ) / var(--sliderberg-slides-to-show, 3)
+  );
+  margin: 0;
+  position: relative;
+}
+
+.sliderberg-carousel-mode .sliderberg-slide {
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
+}
+
+/* === RESPONSIVE CAROUSEL === */
+@media (max-width: 1200px) {
+  .sliderberg-carousel-mode .sliderberg-slides-container > * {
+    flex: 0 0
+      calc(
+        (
+            100% - (min(var(--sliderberg-slides-to-show, 3), 2) - 1) *
+              var(--sliderberg-slide-spacing, 20px)
+          ) / min(var(--sliderberg-slides-to-show, 3), 2)
+      );
+    min-width: calc(
+      (
+          100% - (min(var(--sliderberg-slides-to-show, 3), 2) - 1) *
+            var(--sliderberg-slide-spacing, 20px)
+        ) / min(var(--sliderberg-slides-to-show, 3), 2)
+    );
+  }
+}
+
+@media (max-width: 768px) {
+  .sliderberg-carousel-mode .sliderberg-slides-container > * {
+    flex: 0 0
+      calc(
+        (
+            100% - (min(var(--sliderberg-slides-to-show, 3), 1) - 1) *
+              var(--sliderberg-slide-spacing, 20px)
+          ) / min(var(--sliderberg-slides-to-show, 3), 1)
+      );
+    min-width: calc(
+      (
+          100% - (min(var(--sliderberg-slides-to-show, 3), 1) - 1) *
+            var(--sliderberg-slide-spacing, 20px)
+        ) / min(var(--sliderberg-slides-to-show, 3), 1)
+    );
+  }
+}
+
+/* === TRANSITION STATE === */
+/* Visual feedback during slide transitions */
+.wp-block-sliderberg-sliderberg.sliderberg-transitioning
+  .sliderberg-nav-button {
+  pointer-events: none;
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.wp-block-sliderberg-sliderberg.sliderberg-transitioning
+  .sliderberg-slide-indicator {
+  pointer-events: none;
+  cursor: wait;
+}
+
+/* Optional: add subtle cursor change to entire slider during transition */
+.wp-block-sliderberg-sliderberg.sliderberg-transitioning {
+  cursor: progress;
+}
+
+/* === ACCESSIBILITY: REDUCED MOTION === */
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sliderberg-slides-container,
+  .sliderberg-slide,
+  .sliderberg-nav-button,
+  .sliderberg-slide-indicator,
+  .sliderberg-navigation {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Screen reader only text */
+.sliderberg-live-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* === END === */

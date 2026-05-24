@@ -1,0 +1,194 @@
+/* Slide Block Editor Styles - Rewritten with CSS Grid
+ * Simplified from 828 lines to <200 lines
+ * Fixes nested blocks issue by removing flexbox
+ */
+.sliderberg-placeholder-colors {
+  width: 100%;
+}
+.sliderberg-background-image-control > .components-dropdown {
+  width: 100%;
+}
+/* === SLIDE CONTAINER === */
+.sliderberg-slide {
+  position: relative;
+  min-height: 300px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 1rem 0;
+
+  /* CSS Grid for content positioning - No flex! */
+  display: grid;
+  grid-template-areas: "content";
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* Remove borders for posts slider type */
+[data-type="posts"] .sliderberg-slide {
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+}
+
+/* === OVERLAY === */
+.sliderberg-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  grid-area: content;
+}
+
+/* === CONTENT POSITIONING WITH CSS GRID === */
+/* Using grid's place-items for perfect positioning without affecting children */
+
+.sliderberg-content-position-top-left .sliderberg-slide-content {
+  place-self: start start;
+}
+
+.sliderberg-content-position-top-center .sliderberg-slide-content {
+  place-self: start center;
+}
+
+.sliderberg-content-position-top-right .sliderberg-slide-content {
+  place-self: start end;
+}
+
+.sliderberg-content-position-center-left .sliderberg-slide-content {
+  place-self: center start;
+}
+
+.sliderberg-content-position-center-center .sliderberg-slide-content {
+  place-self: center center;
+}
+
+.sliderberg-content-position-center-right .sliderberg-slide-content {
+  place-self: center end;
+}
+
+.sliderberg-content-position-bottom-left .sliderberg-slide-content {
+  place-self: end start;
+}
+
+.sliderberg-content-position-bottom-center .sliderberg-slide-content {
+  place-self: end center;
+}
+
+.sliderberg-content-position-bottom-right .sliderberg-slide-content {
+  place-self: end end;
+}
+
+/* === CONTENT WRAPPER === */
+.sliderberg-slide-content {
+  grid-area: content;
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+  max-width: min(90%, 1200px);
+  width: auto;
+
+  /* Allow normal block flow - NO flexbox! */
+  display: block;
+}
+
+/* Inner wrapper - minimal styling */
+.sliderberg-slide-inner {
+  /* Let WordPress blocks render naturally */
+}
+
+/* Block editor integration */
+.sliderberg-slide-content .block-editor-inner-blocks,
+.sliderberg-slide-content .block-editor-block-list__layout {
+  /* Normal block flow - no overrides needed */
+}
+
+/* === SLIDE NUMBER INDICATOR === */
+.sliderberg-slide-number {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: #f0f0f0;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #666;
+  z-index: 10;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 782px) {
+  .sliderberg-slide-content {
+    max-width: 100%;
+    padding: 1rem;
+  }
+}
+
+/* === PLACEHOLDER STATE === */
+.sliderberg-slide-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === CAROUSEL MODE === */
+/* Simplified - no fighting with block editor */
+.sliderberg-carousel-mode .sliderberg-slide {
+  height: auto;
+  min-height: 300px;
+}
+
+.sliderberg-carousel-mode .block-editor-block-list__layout {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: var(--sliderberg-slide-spacing, 20px);
+  transition: transform 0.4s ease;
+}
+
+.sliderberg-carousel-mode
+  .block-editor-block-list__layout
+  > .block-editor-block-list__block {
+  flex: 0 0
+    calc(
+      (
+          100% - (var(--sliderberg-slides-to-show, 3) - 1) *
+            var(--sliderberg-slide-spacing, 20px)
+        ) / var(--sliderberg-slides-to-show, 3)
+    );
+  min-width: calc(
+    (
+        100% - (var(--sliderberg-slides-to-show, 3) - 1) *
+          var(--sliderberg-slide-spacing, 20px)
+      ) / var(--sliderberg-slides-to-show, 3)
+  );
+}
+
+/* Active slide indicator in carousel */
+.sliderberg-carousel-mode .block-editor-block-list__block.active {
+  box-shadow: 0 0 0 3px #007cba;
+  border-radius: 8px;
+}
+
+/* === CORE BLOCK COMPATIBILITY === */
+/* Minimal rules - most blocks work naturally now */
+
+.sliderberg-slide .aligncenter {
+  display: table;
+  margin-inline: auto;
+}
+
+.sliderberg-slide .alignleft {
+  float: left;
+  margin-right: 1em;
+}
+
+.sliderberg-slide .alignright {
+  float: right;
+  margin-left: 1em;
+}
+
+/* === END === */
+/* Total: ~180 lines (down from 828) */
