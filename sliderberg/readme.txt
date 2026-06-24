@@ -1,9 +1,9 @@
-=== Slider Block by Sliderberg - Slider & Carousel Plugin for Gutenberg ===
-Contributors: imtiazrayhan, dotcamp
+=== Slider & Carousel Block by Sliderberg ===
+Contributors: imtiazrayhan, dotcamp, farhanshafi
 Tags: slider, carousel, text slider, block, gutenberg
 Requires at least: 5.8
-Tested up to: 6.8
-Stable tag: 1.0.8
+Tested up to: 7.0
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,22 @@ Yes, carousel mode fully supports infinite loop scrolling, allowing your content
 8. Testimonials Slider
 
 == Changelog ==
+
+= 1.0.9 =
+
+* IMPROVED: Editor and frontend slider behavior now run on a more reliable Swiper-based runtime with better carousel handling.
+* IMPROVED: Width Settings panel now opens by default in the block inspector.
+* NEW: Slides can now be set as full-slide clickable links.
+* NEW: Added Slider and Carousel block variations, making each available as a distinct option in the block inserter.
+* NEW: Added more navigation positioning options with refined arrow size and placement controls.
+* IMPROVED: Editor UX with cleaner settings panels, better slide selectability, visible placeholders, and Default as the default width setting.
+* FIX: Slide background color, image, gradient, and overlay rendering now work correctly.
+* FIX: Adding slides now keeps the editor preview in sync and no longer breaks the slider layout.
+* FIX: Prevented third-party Swiper CSS from reintroducing unwanted arrow pseudo-elements in navigation buttons.
+* PRO: NEW: Added the Sliderberg Pro addon for users who want premium slider features on top of the free plugin.
+* PRO: NEW: Added premium transition effects including Coverflow, Flip, Cube, and Parallax.
+* PRO: NEW: Added vertical slider direction support for both the editor and frontend.
+* PRO: NEW: Added Fraction and Progress Bar pagination types with premium color and typography controls.
 
 = 1.0.8 =
 

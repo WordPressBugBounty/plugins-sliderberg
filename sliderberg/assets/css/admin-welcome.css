@@ -561,6 +561,25 @@
     outline-offset: 2px;
 }
 
+/* Pro Active (user already has PRO) */
+.sliderberg-pro-active {
+    background: linear-gradient(135deg, #f0f7ff 0%, #e8f3fe 100%);
+}
+
+.sliderberg-pro-active-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #4a90e2, #357abd);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
 /* Support and Newsletter Buttons */
 .sliderberg-support-button,
 .sliderberg-newsletter-button {

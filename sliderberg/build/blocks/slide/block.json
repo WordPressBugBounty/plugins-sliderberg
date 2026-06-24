@@ -1,0 +1,104 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "sliderberg/slide",
+  "version": "1.0.0",
+  "title": "Slide",
+  "category": "widgets",
+  "icon": "cover-image",
+  "description": "A sophisticated slide with advanced background and content positioning options.",
+  "parent": [
+    "sliderberg/sliderberg"
+  ],
+  "usesContext": [
+    "sliderberg/minHeight",
+    "sliderberg/transitionEffect"
+  ],
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "inserter": false
+  },
+  "attributes": {
+    "backgroundType": {
+      "type": "string",
+      "default": "color"
+    },
+    "backgroundImage": {
+      "type": "object",
+      "default": null
+    },
+    "backgroundColor": {
+      "type": "string",
+      "default": null
+    },
+    "backgroundGradient": {
+      "type": "string",
+      "default": null
+    },
+    "focalPoint": {
+      "type": "object",
+      "default": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    },
+    "overlayColor": {
+      "type": "string",
+      "default": "#0000004D"
+    },
+    "overlayOpacity": {
+      "type": "number",
+      "default": 0
+    },
+    "minHeight": {
+      "type": "number",
+      "default": 400
+    },
+    "contentPosition": {
+      "type": "string",
+      "default": "center-center"
+    },
+    "isFixed": {
+      "type": "boolean",
+      "default": false
+    },
+    "borderWidth": {
+      "type": "number",
+      "default": 0
+    },
+    "borderColor": {
+      "type": "string",
+      "default": "#000000"
+    },
+    "borderStyle": {
+      "type": "string",
+      "default": "solid"
+    },
+    "border": {
+      "type": "object",
+      "default": {}
+    },
+    "borderRadius": {
+      "type": "number",
+      "default": 0
+    },
+    "slideBorderRadius": {
+      "type": "object",
+      "default": {}
+    },
+    "isBorderControlChanged": {
+      "type": "boolean",
+      "default": false
+    },
+    "slideLink": {
+      "type": "string",
+      "default": ""
+    },
+    "slideLinkNewTab": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "textdomain": "sliderberg"
+}

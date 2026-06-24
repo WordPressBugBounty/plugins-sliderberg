@@ -8,7 +8,8 @@
   "icon": "slides",
   "description": "Add a beautiful slider to your content.",
   "providesContext": {
-    "sliderberg/minHeight": "minHeight"
+    "sliderberg/minHeight": "minHeight",
+    "sliderberg/transitionEffect": "transitionEffect"
   },
   "supports": {
     "html": false,
@@ -24,7 +25,7 @@
   "attributes": {
     "align": {
       "type": "string",
-      "default": "full"
+      "default": ""
     },
     "type": {
       "type": "string",
@@ -70,6 +71,10 @@
       "type": "string",
       "default": "medium"
     },
+    "navigationSizeValue": {
+      "type": "object",
+      "default": {}
+    },
     "navigationColor": {
       "type": "string",
       "default": "#ffffff"
@@ -90,6 +95,78 @@
       "type": "number",
       "default": 20
     },
+    "navHorizontal": {
+      "type": "string",
+      "default": "space-between"
+    },
+    "navVertical": {
+      "type": "string",
+      "default": "center"
+    },
+    "navOutside": {
+      "type": "boolean",
+      "default": false
+    },
+    "navFreePosition": {
+      "type": "boolean",
+      "default": false
+    },
+    "navFreeX": {
+      "type": "number",
+      "default": 50
+    },
+    "navFreeY": {
+      "type": "number",
+      "default": 50
+    },
+    "prevFreeX": {
+      "type": "number",
+      "default": 3
+    },
+    "prevFreeY": {
+      "type": "number",
+      "default": 50
+    },
+    "nextFreeX": {
+      "type": "number",
+      "default": 97
+    },
+    "nextFreeY": {
+      "type": "number",
+      "default": 50
+    },
+    "dotsFreeX": {
+      "type": "number",
+      "default": 50
+    },
+    "dotsFreeY": {
+      "type": "number",
+      "default": 90
+    },
+    "prevArrowH": {
+      "type": "string",
+      "default": "left"
+    },
+    "prevArrowV": {
+      "type": "string",
+      "default": "center"
+    },
+    "nextArrowH": {
+      "type": "string",
+      "default": "right"
+    },
+    "nextArrowV": {
+      "type": "string",
+      "default": "center"
+    },
+    "dotsHorizontal": {
+      "type": "string",
+      "default": "center"
+    },
+    "dotsVertical": {
+      "type": "string",
+      "default": "bottom"
+    },
     "dotColor": {
       "type": "string",
       "default": "#6c757d"
@@ -108,7 +185,7 @@
     },
     "widthPreset": {
       "type": "string",
-      "default": "full"
+      "default": "default"
     },
     "customWidth": {
       "type": "string",
@@ -165,6 +242,10 @@
     "minHeight": {
       "type": "number",
       "default": 400
+    },
+    "sliderDirection": {
+      "type": "string",
+      "default": "horizontal"
     }
   },
   "textdomain": "sliderberg",

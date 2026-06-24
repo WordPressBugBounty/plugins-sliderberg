@@ -523,7 +523,39 @@ function sliderberg_welcome_page() {
 
             <!-- Sidebar -->
             <div class="sliderberg-welcome-sidebar">
-                
+
+                <!-- PRO Upgrade / Pro Status -->
+                <?php $sliderberg_is_pro = class_exists( 'SliderbergPro\Pro_Features' ); ?>
+                <?php if ( $sliderberg_is_pro ) : ?>
+                <div class="sliderberg-sidebar-section sliderberg-pro-section sliderberg-pro-active">
+                    <div class="sliderberg-pro-active-badge">&#10003;</div>
+                    <h3><?php echo esc_html__( "You're a Pro User!", 'sliderberg' ); ?></h3>
+                    <p><?php echo esc_html__( 'Thank you for supporting Sliderberg. All pro features are unlocked.', 'sliderberg' ); ?></p>
+                    <ul class="sliderberg-quick-links">
+                        <li><a href="<?php echo esc_url( 'https://sliderberg.com/docs/' ); ?>" target="_blank" rel="noopener noreferrer" class="sliderberg-link"><?php echo esc_html__( 'Documentation', 'sliderberg' ); ?></a></li>
+                        <li><a href="<?php echo esc_url( 'https://sliderberg.com/contact/' ); ?>" target="_blank" rel="noopener noreferrer" class="sliderberg-link"><?php echo esc_html__( 'Priority Support', 'sliderberg' ); ?></a></li>
+                        <li><a href="<?php echo esc_url( 'https://wordpress.org/support/plugin/sliderberg/reviews/' ); ?>" target="_blank" rel="noopener noreferrer" class="sliderberg-link"><?php echo esc_html__( 'Leave a Review', 'sliderberg' ); ?></a></li>
+                    </ul>
+                </div>
+                <?php else : ?>
+                <div class="sliderberg-sidebar-section sliderberg-pro-section">
+                    <h3><?php echo esc_html__( 'Upgrade to Sliderberg PRO', 'sliderberg' ); ?></h3>
+                    <p><?php echo esc_html__( 'Unlock powerful transition effects, pagination styles, and more.', 'sliderberg' ); ?></p>
+                    <ul class="sliderberg-pro-features">
+                        <li><?php echo esc_html__( '✦ Coverflow Effect', 'sliderberg' ); ?></li>
+                        <li><?php echo esc_html__( '✦ Flip Effect', 'sliderberg' ); ?></li>
+                        <li><?php echo esc_html__( '✦ Cube Effect', 'sliderberg' ); ?></li>
+                        <li><?php echo esc_html__( '✦ Parallax Effect', 'sliderberg' ); ?></li>
+                        <li><?php echo esc_html__( '✦ Fraction Pagination', 'sliderberg' ); ?></li>
+                        <li><?php echo esc_html__( '✦ Progress Bar Pagination', 'sliderberg' ); ?></li>
+                        <li><?php echo esc_html__( '✦ Vertical Slider', 'sliderberg' ); ?></li>
+                    </ul>
+                    <a href="https://sliderberg.com/pricing/" target="_blank" rel="noopener noreferrer" class="sliderberg-pro-button">
+                        <?php echo esc_html__( 'Get Sliderberg PRO', 'sliderberg' ); ?>
+                    </a>
+                </div>
+                <?php endif; ?>
+
                 <!-- Quick Links -->
                 <div class="sliderberg-sidebar-section">
                     <h3><?php echo esc_html__('Quick Links', 'sliderberg'); ?></h3>

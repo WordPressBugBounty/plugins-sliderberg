@@ -1,217 +1,188 @@
 <?php
 /**
- * PHP renderer for slide block - Rewritten for Grid layout
- * File: includes/slide-renderer.php
+ * Slide block server-side renderer.
+ * Outputs a swiper-slide div with background, overlay, and content.
  *
- * Outputs clean DOM structure that works with CSS Grid positioning
- * No flexbox interference with nested blocks
- *
- * @since 1.0.0 Original implementation
- * @since 2.0.0 Rewritten with Grid layout support
- * @since 2.1.0 Refactored to use centralized security functions
- * @since 2.2.0 Updated to use Sliderberg_Styles_CSS_Generator class
+ * @package Sliderberg
  */
 
-// Include the CSS generator class
-require_once __DIR__ . '/class-styles-css-generator.php';
-
-/**
- * Validate gradient CSS value
- * 
- * @param string $gradient The gradient value to validate
- * @return string Validated gradient or empty string
- */
-function sliderberg_validate_gradient($gradient) {
-    if (empty($gradient)) {
-        return '';
-    }
-    
-    // Remove any potential script injections
-    $gradient = preg_replace('/<script[^>]*>.*?<\/script>/i', '', $gradient);
-    $gradient = str_ireplace('javascript:', '', $gradient);
-    $gradient = trim($gradient);
-    
-    // Validate gradient syntax
-    if (!preg_match('/^(linear-gradient|radial-gradient|conic-gradient|repeating-linear-gradient|repeating-radial-gradient)\s*\(/i', $gradient)) {
-        return '';
-    }
-    
-    // Check for balanced parentheses
-    $open_count = substr_count($gradient, '(');
-    $close_count = substr_count($gradient, ')');
-    if ($open_count !== $close_count || $open_count === 0) {
-        return '';
-    }
-    
-    // Additional safety check for valid CSS color values
-    if (!preg_match('/(#[0-9A-Fa-f]{3,8}|rgb|rgba|hsl|hsla|transparent|currentColor|[a-z]+)/i', $gradient)) {
-        return '';
-    }
-    
-    return $gradient;
-}
-
-function render_sliderberg_slide_block($attributes, $content, $block) {
-    // Get parent slider's minHeight from block context
-    $parent_min_height = $block->context['sliderberg/minHeight'] ?? 400;
-    // Set defaults and sanitize
-    $background_image = $attributes['backgroundImage'] ?? null;
-    
-    // Use Sliderberg_Styles_CSS_Generator for background color/gradient
-    $background_value = Sliderberg_Styles_CSS_Generator::get_background_color_var(
-        $attributes,
-        'backgroundColor',
-        'backgroundGradient'
-    );
-    
-    $focal_point = sliderberg_sanitize_focal_point($attributes['focalPoint'] ?? null);
-    
-    // Use centralized color validation for overlay
-    $overlay_color = sliderberg_validate_color($attributes['overlayColor'] ?? '');
-    if (empty($overlay_color)) {
-        $overlay_color = '#000000'; // Default
-    }
-    
-    $overlay_opacity = floatval($attributes['overlayOpacity'] ?? 0);
-    $min_height = sliderberg_validate_numeric_range($attributes['minHeight'] ?? 400, 100, 1000, 400);
-    
-    // Use parent's minHeight if slide's minHeight is the default (400)
-    // This allows individual slides to override the parent's setting
-    $effective_min_height = ($min_height !== 400) ? $min_height : $parent_min_height;
-
-    $content_position = sliderberg_validate_position($attributes['contentPosition'] ?? 'center-center');
-    $is_fixed = (bool)($attributes['isFixed'] ?? false);
-    
-    // New border object format
-    $border = $attributes['border'] ?? [];
-    $slide_border_radius = $attributes['slideBorderRadius'] ?? [];
-    
-    // Build classes
-    $classes = [
-        'sliderberg-slide',
-        'sliderberg-content-position-' . $content_position
-    ];
-    
-    // Add border class if slide has borders
-    $has_border = !empty($border);
-    if ($has_border) {
-        $classes[] = 'has-border';
-    }
-    
-    // Build styles - use effective_min_height instead of min_height
-    $styles = ['min-height: ' . $effective_min_height . 'px'];
-    
-    // Process border - use new object format only
-    if (!empty($border)) {
-        $border_in_dimensions = Sliderberg_Styles_CSS_Generator::get_border_css($border);
-        $sides = ['top', 'right', 'bottom', 'left'];
-        foreach ($sides as $side) {
-            $border_value = Sliderberg_Styles_CSS_Generator::get_single_side_border_value($border_in_dimensions, $side);
-            if (!empty($border_value) && trim($border_value) !== '') {
-                $styles[] = 'border-' . $side . ': ' . esc_attr($border_value);
-            }
-        }
-    }
-    
-    // Process border radius - use new object format only
-    if (!empty($slide_border_radius)) {
-        $corners = [
-            'topLeft' => 'border-top-left-radius',
-            'topRight' => 'border-top-right-radius',
-            'bottomLeft' => 'border-bottom-left-radius',
-            'bottomRight' => 'border-bottom-right-radius'
-        ];
-        foreach ($corners as $corner => $css_property) {
-            if (!empty($slide_border_radius[$corner])) {
-                $styles[] = $css_property . ': ' . esc_attr($slide_border_radius[$corner]);
-            }
-        }
-    }
-    
-    // Apply background - gradient takes precedence, then image, then color
-    if (!empty($background_value)) {
-        // Check if it's a gradient
-        if (strpos($background_value, 'gradient') !== false) {
-            $validated_gradient = sliderberg_validate_gradient($background_value);
-            if (!empty($validated_gradient)) {
-                $styles[] = 'background-image: ' . esc_attr($validated_gradient);
-            }
-        } else {
-            // It's a solid color
-            $styles[] = 'background-color: ' . esc_attr($background_value);
-        }
-    }
-    
-    if ($background_image && !empty($background_image['url'])) {
-        // Validate image URL
-        $image_url = esc_url($background_image['url']);
-        if (!empty($image_url)) {
-            $styles[] = 'background-image: url(' . $image_url . ')';
-            // Validate and sanitize focal point values
-            $focal_x = max(0, min(1, floatval($focal_point['x'] ?? 0.5))) * 100;
-            $focal_y = max(0, min(1, floatval($focal_point['y'] ?? 0.5))) * 100;
-            $styles[] = 'background-position: ' . esc_attr($focal_x) . '% ' . esc_attr($focal_y) . '%';
-            $styles[] = 'background-size: cover';
-            $styles[] = 'background-attachment: ' . ($is_fixed ? 'fixed' : 'scroll');
-        }
-    }
-    
-    // Process inner blocks content
-    $inner_content = '';
-    if ($block instanceof WP_Block && !empty($block->inner_blocks)) {
-        foreach ($block->inner_blocks as $inner_block) {
-            $inner_content .= $inner_block->render();
-        }
-    } else {
-        // Fallback to $content parameter
-        $inner_content = $content;
-    }
-    
-    // Allow filtering classes and styles before render
-    $classes = apply_filters('sliderberg_slide_classes', $classes, $attributes);
-    $styles = apply_filters('sliderberg_slide_styles', $styles, $attributes);
-    
-    // Prepare template variables
-    $class_string = esc_attr(implode(' ', $classes));
-    $style_string = esc_attr(implode('; ', $styles));
-    $has_overlay = $overlay_opacity > 0;
-    $content = $inner_content; // Use processed content
-    // Centralized sanitization: allow embeds via allowed HTML
-    $content = wp_kses($content, sliderberg_get_allowed_html());
-    
-    // Render template
-    ob_start();
-    
-    /**
-     * Action: Fires before a single slide is rendered
-     * 
-     * @since 2.1.0
-     * @param array $attributes The slide attributes
-     */
-    do_action('sliderberg_before_slide', $attributes);
-    
-    include __DIR__ . '/templates/slide-block.php';
-    
-    /**
-     * Action: Fires after a single slide is rendered
-     * 
-     * @since 2.1.0
-     * @param array $attributes The slide attributes
-     */
-    do_action('sliderberg_after_slide', $attributes);
-    
-    return ob_get_clean();
+if ( ! defined( 'WPINC' ) ) {
+    die;
 }
 
 /**
- * Register the slide block
+ * Register the slide block with PHP rendering.
  */
 function sliderberg_register_slide_block() {
-    register_block_type(
-        'sliderberg/slide',
-        [
+    register_block_type_from_metadata(
+        SLIDERBERG_PLUGIN_DIR . 'build/blocks/slide',
+        array(
             'render_callback' => 'render_sliderberg_slide_block',
-            'uses_context' => ['sliderberg/minHeight']
-        ]
+        )
+    );
+}
+
+/**
+ * Render the slide block on the frontend.
+ *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Inner block content.
+ * @param WP_Block $block      Block instance.
+ * @return string HTML output.
+ */
+function render_sliderberg_slide_block( $attributes, $content, $block ) {
+    // Min height: use slide's own value if not default, otherwise inherit from parent context
+    $parent_min_height = isset( $block->context['sliderberg/minHeight'] ) ? absint( $block->context['sliderberg/minHeight'] ) : 400;
+    $slide_min_height  = isset( $attributes['minHeight'] ) ? absint( $attributes['minHeight'] ) : 400;
+    $effective_height  = ( $slide_min_height !== 400 ) ? $slide_min_height : $parent_min_height;
+    $transition_effect = isset( $block->context['sliderberg/transitionEffect'] ) ? $block->context['sliderberg/transitionEffect'] : 'slide';
+    $is_parallax       = 'parallax' === $transition_effect;
+
+    // Background — infer type from values so backgroundType doesn't need to be kept in sync
+    $bg_styles = array();
+
+    if ( ! empty( $attributes['backgroundImage']['url'] ) ) {
+        $bg_url  = esc_url( $attributes['backgroundImage']['url'] );
+        $focal_x = isset( $attributes['focalPoint']['x'] ) ? floatval( $attributes['focalPoint']['x'] ) * 100 : 50;
+        $focal_y = isset( $attributes['focalPoint']['y'] ) ? floatval( $attributes['focalPoint']['y'] ) * 100 : 50;
+        $is_fixed = ! empty( $attributes['isFixed'] );
+
+        $bg_styles[] = sprintf( 'background-image:url(%s)', $bg_url );
+        $bg_styles[] = 'background-size:cover';
+        $bg_styles[] = sprintf( 'background-position:%s%% %s%%', $focal_x, $focal_y );
+        $bg_styles[] = 'background-repeat:no-repeat';
+        $bg_styles[] = sprintf( 'background-attachment:%s', $is_fixed ? 'fixed' : 'scroll' );
+    } elseif ( ! empty( $attributes['backgroundGradient'] ) ) {
+        $bg_styles[] = sprintf( 'background-image:%s', esc_attr( $attributes['backgroundGradient'] ) );
+    } elseif ( ! empty( $attributes['backgroundColor'] ) ) {
+        $bg_styles[] = sprintf( 'background-color:%s', esc_attr( $attributes['backgroundColor'] ) );
+    }
+
+    // Border (new per-side format)
+    $border = isset( $attributes['border'] ) ? $attributes['border'] : array();
+    $border_styles = array();
+    if ( is_array( $border ) && ! empty( $border ) ) {
+        $sides = array( 'top', 'right', 'bottom', 'left' );
+        foreach ( $sides as $side ) {
+            if ( ! empty( $border[ $side ] ) ) {
+                $b = $border[ $side ];
+                $width = isset( $b['width'] ) ? esc_attr( $b['width'] ) : '0px';
+                $style = isset( $b['style'] ) ? esc_attr( $b['style'] ) : 'solid';
+                $color = isset( $b['color'] ) ? esc_attr( $b['color'] ) : 'transparent';
+                $border_styles[] = sprintf( 'border-%s:%s %s %s', $side, $width, $style, $color );
+            }
+        }
+    }
+
+    // Border radius (new per-corner format)
+    $border_radius = isset( $attributes['slideBorderRadius'] ) ? $attributes['slideBorderRadius'] : array();
+    $radius_styles = array();
+    if ( is_array( $border_radius ) && ! empty( $border_radius ) ) {
+        $corners = array(
+            'topLeft'     => 'border-top-left-radius',
+            'topRight'    => 'border-top-right-radius',
+            'bottomLeft'  => 'border-bottom-left-radius',
+            'bottomRight' => 'border-bottom-right-radius',
+        );
+        foreach ( $corners as $key => $prop ) {
+            if ( ! empty( $border_radius[ $key ] ) ) {
+                $radius_styles[] = sprintf( '%s:%s', $prop, esc_attr( $border_radius[ $key ] ) );
+            }
+        }
+    }
+
+    // Content position
+    $position = isset( $attributes['contentPosition'] ) ? $attributes['contentPosition'] : 'center-center';
+    $valid_positions = array(
+        'top-left', 'top-center', 'top-right',
+        'center-left', 'center-center', 'center-right',
+        'bottom-left', 'bottom-center', 'bottom-right',
+    );
+    if ( ! in_array( $position, $valid_positions, true ) ) {
+        $position = 'center-center';
+    }
+
+    $parts          = explode( '-', $position );
+    $vertical       = isset( $parts[0] ) ? $parts[0] : 'center';
+    $horizontal     = isset( $parts[1] ) ? $parts[1] : 'center';
+    $align_items    = 'center' === $vertical ? 'center' : ( 'top' === $vertical ? 'flex-start' : 'flex-end' );
+    $justify_content = 'center' === $horizontal ? 'center' : ( 'left' === $horizontal ? 'flex-start' : 'flex-end' );
+
+    // Combine all slide styles
+    $base_slide_styles = array_merge(
+        $border_styles,
+        $radius_styles,
+        array( sprintf( 'min-height:%dpx', $effective_height ) )
+    );
+
+    if ( $is_parallax ) {
+        $slide_style_str = implode( ';', $base_slide_styles );
+    } else {
+        $slide_style_str = implode( ';', array_merge( $bg_styles, $base_slide_styles ) );
+    }
+
+    // Content styles
+    $content_style = sprintf(
+        'display:flex;flex-direction:column;align-items:%s;justify-content:%s;min-height:%dpx;padding:20px;width:100%%;box-sizing:border-box;',
+        $align_items,
+        $justify_content,
+        $effective_height
+    );
+
+    // Overlay
+    $overlay_html  = '';
+    $overlay_color = isset( $attributes['overlayColor'] ) ? $attributes['overlayColor'] : '';
+    $has_image     = ! empty( $attributes['backgroundImage']['url'] );
+    if ( ! empty( $overlay_color ) && $has_image ) {
+        $overlay_opacity = isset( $attributes['overlayOpacity'] ) ? floatval( $attributes['overlayOpacity'] ) : 1;
+        if ( $overlay_opacity <= 0 ) {
+            $overlay_opacity = 1;
+        }
+        $overlay_html = sprintf(
+            '<div class="sliderberg-slide-overlay" style="position:absolute;top:0;left:0;right:0;bottom:0;background-color:%s;opacity:%s;pointer-events:none;z-index:1;"></div>',
+            esc_attr( $overlay_color ),
+            $overlay_opacity
+        );
+    }
+
+    $background_html = '';
+    if ( $is_parallax && ! empty( $bg_styles ) ) {
+        $background_html = sprintf(
+            '<div class="sliderberg-slide-background" style="%1$s;position:absolute;top:0;left:0;right:0;bottom:0;" data-swiper-parallax="-20%%"></div>',
+            esc_attr( implode( ';', $bg_styles ) )
+        );
+    }
+
+    // Slide link
+    $slide_link         = isset( $attributes['slideLink'] ) ? esc_url( $attributes['slideLink'] ) : '';
+    $slide_link_new_tab = ! empty( $attributes['slideLinkNewTab'] );
+    $slide_link_attrs   = '';
+    $slide_link_style   = '';
+    if ( ! empty( $slide_link ) ) {
+        $slide_link_attrs = sprintf(
+            ' data-slide-link="%s" data-slide-link-target="%s"',
+            $slide_link,
+            $slide_link_new_tab ? '_blank' : '_self'
+        );
+        $slide_link_style = 'cursor:pointer;';
+    }
+
+    // Build slide classes
+    $slide_classes = 'swiper-slide sliderberg-slide';
+    $slide_classes = apply_filters( 'sliderberg_slide_classes', $slide_classes, $attributes );
+
+    $content_parallax_attr = $is_parallax ? ' data-swiper-parallax="-100"' : '';
+
+    return sprintf(
+        '<div class="%1$s" style="%2$s;position:relative;overflow:hidden;%8$s"%9$s>%3$s%4$s<div class="sliderberg-slide-content" style="%5$s;position:relative;z-index:2;"%6$s>%7$s</div></div>',
+        esc_attr( $slide_classes ),
+        esc_attr( $slide_style_str ),
+        $background_html,
+        $overlay_html,
+        esc_attr( $content_style ),
+        $content_parallax_attr,
+        $content,
+        esc_attr( $slide_link_style ),
+        $slide_link_attrs
     );
 }

@@ -3,7 +3,7 @@
  * Plugin Name: Sliderberg
  * Plugin URI: https://sliderberg.com/
  * Description: Slider Block For the Block Editor (Gutenberg). Slide Anything With Ease.
- * Version: 1.0.8
+ * Version: 1.0.9
  * Author: DotCamp
  * Author URI: https://dotcamp.com/
  * License: GPL v2 or later
@@ -18,7 +18,7 @@ if (!defined('WPINC')) {
 }
 
 // Define plugin constants
-define( 'SLIDERBERG_VERSION', '1.0.8' );
+define( 'SLIDERBERG_VERSION', '1.0.9' );
 define('SLIDERBERG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SLIDERBERG_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -54,7 +54,7 @@ if ( ! function_exists( 'sli_fs' ) ) {
     do_action( 'sli_fs_loaded' );
 }
 
-// Include security utilities
+// Include security helpers (must load before admin-welcome.php)
 require_once SLIDERBERG_PLUGIN_DIR . 'includes/security.php';
 
 // Include admin welcome page
@@ -115,7 +115,16 @@ function sliderberg_init() {
         $editor_version
     );
 
-    // Register view script
+    // Register view script and styles (includes Swiper CSS)
+    $view_css_version = file_exists( SLIDERBERG_PLUGIN_DIR . 'build/view.css' ) ? filemtime( SLIDERBERG_PLUGIN_DIR . 'build/view.css' ) : SLIDERBERG_VERSION;
+
+    wp_register_style(
+        'sliderberg-view',
+        SLIDERBERG_PLUGIN_URL . 'build/view.css',
+        array(),
+        $view_css_version
+    );
+
     wp_register_script(
         'sliderberg-view',
         SLIDERBERG_PLUGIN_URL . 'build/view.js',
@@ -145,24 +154,48 @@ add_action('plugins_loaded', function() {
 
 // Enqueue editor assets
 function sliderberg_editor_assets() {
-    // Enqueue the already-registered editor script (registered in sliderberg_init)
-    wp_enqueue_script('sliderberg-editor');
-    
-    // Get valid transition effects through filter
-    $valid_effects = apply_filters('sliderberg_valid_transition_effects', array('slide', 'fade', 'zoom'));
-    
-    // Localize script data
-    wp_localize_script('sliderberg-editor', 'sliderbergData', array(
-        'validTransitionEffects' => $valid_effects
-    ));
+    wp_enqueue_script( 'sliderberg-editor' );
+
+    // Pass pro status and upgrade URL to the editor JS.
+    // isPro is true when the pro plugin is active and its class is loaded.
+    $is_pro      = class_exists( 'SliderbergPro\Pro_Features' );
+    $upgrade_url =  'https://sliderberg.com/pricing/';
+
+    // Scan assets/images/upsell/ and build a feature-key → URL map.
+    // Drop any image named by feature key (e.g. cube-effect.gif) there; no rebuild needed.
+    $images_dir    = plugin_dir_path( __FILE__ ) . 'assets/images/upsell/';
+    $images_url    = plugins_url( 'assets/images/upsell/', __FILE__ );
+    $upsell_images = array();
+
+    if ( is_dir( $images_dir ) ) {
+        $allowed_ext = array( 'gif', 'png', 'jpg', 'jpeg', 'webp', 'svg' );
+        foreach ( glob( $images_dir . '*' ) as $file ) {
+            $ext = strtolower( pathinfo( $file, PATHINFO_EXTENSION ) );
+            if ( in_array( $ext, $allowed_ext, true ) ) {
+                $key                   = pathinfo( $file, PATHINFO_FILENAME );
+                $upsell_images[ $key ] = $images_url . basename( $file );
+            }
+        }
+    }
+
+    wp_localize_script(
+        'sliderberg-editor',
+        'sliderbergData',
+        array(
+            'isPro'        => $is_pro,
+            'upgradeUrl'   => esc_url( $upgrade_url ),
+            'upsellImages' => $upsell_images,
+        )
+    );
 }
-add_action('enqueue_block_editor_assets', 'sliderberg_editor_assets');
+add_action( 'enqueue_block_editor_assets', 'sliderberg_editor_assets' );
 
 // Enqueue frontend assets
 function sliderberg_frontend_assets() {
     // Only enqueue if we have sliderberg blocks on the page
     if (has_block('sliderberg/sliderberg')) {
         wp_enqueue_style('sliderberg-style');
+        wp_enqueue_style('sliderberg-view');
         wp_enqueue_script('sliderberg-view');
         
         // Pro add-ons can enqueue wp-hooks here to enable frontend filters:
@@ -171,140 +204,3 @@ function sliderberg_frontend_assets() {
 }
 add_action('wp_enqueue_scripts', 'sliderberg_frontend_assets');
 
-/**
- * Handle plugin installation via AJAX
- */
-function sliderberg_install_plugin() {
-    // Check if request is AJAX
-    if (!wp_doing_ajax()) {
-        wp_die('Invalid request', 'Invalid Request', array('response' => 400));
-    }
-    
-    // Validate request origin
-    if (!sliderberg_validate_ajax_origin()) {
-        wp_send_json_error(array('message' => 'Invalid request origin'));
-    }
-    
-    // Check rate limiting
-    if (!sliderberg_check_rate_limit('install_plugin', 3, 300)) {
-        wp_send_json_error(array('message' => 'Too many requests. Please try again later.'));
-    }
-    
-    // Check nonce
-    if (!check_ajax_referer('sliderberg_plugin_action', '_ajax_nonce', false)) {
-        wp_send_json_error(array('message' => 'Security check failed'));
-    }
-
-    // Check user capabilities
-    if (!current_user_can('install_plugins')) {
-        wp_send_json_error(array('message' => 'You do not have permission to install plugins'));
-    }
-
-    // Get plugin slug with strict validation
-    $plugin = isset($_POST['plugin']) ? sanitize_text_field(wp_unslash($_POST['plugin'])) : '';
-    
-    // Validate plugin slug format (alphanumeric and hyphens only)
-    if (!preg_match('/^[a-z0-9\-]+$/', $plugin)) {
-        wp_send_json_error(array('message' => 'Invalid plugin slug format'));
-    }
-    
-    if (empty($plugin) || strlen($plugin) > 50) {
-        wp_send_json_error(array('message' => 'Plugin slug is required and must be less than 50 characters'));
-    }
-    
-    // Validate plugin is in whitelist
-    if (!sliderberg_is_allowed_plugin($plugin)) {
-        wp_send_json_error(array('message' => 'Plugin not allowed'));
-    }
-
-    // Include required files
-    require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-    require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-    require_once ABSPATH . 'wp-admin/includes/plugin.php';
-
-    // Get plugin info
-    $api = plugins_api('plugin_information', array('slug' => $plugin));
-    if (is_wp_error($api)) {
-        wp_send_json_error(array('message' => $api->get_error_message()));
-    }
-
-    // Install plugin
-    $upgrader = new Plugin_Upgrader(new Automatic_Upgrader_Skin());
-    $result = $upgrader->install($api->download_link);
-
-    if (is_wp_error($result)) {
-        wp_send_json_error(array('message' => $result->get_error_message()));
-    }
-
-    wp_send_json_success();
-}
-add_action('wp_ajax_sliderberg_install_plugin', 'sliderberg_install_plugin');
-
-/**
- * Handle plugin activation via AJAX
- */
-function sliderberg_activate_plugin() {
-    // Check if request is AJAX
-    if (!wp_doing_ajax()) {
-        wp_die('Invalid request', 'Invalid Request', array('response' => 400));
-    }
-    
-    // Validate request origin
-    if (!sliderberg_validate_ajax_origin()) {
-        wp_send_json_error(array('message' => 'Invalid request origin'));
-    }
-    
-    // Check rate limiting
-    if (!sliderberg_check_rate_limit('activate_plugin', 5, 300)) {
-        wp_send_json_error(array('message' => 'Too many requests. Please try again later.'));
-    }
-    
-    // Check nonce
-    if (!check_ajax_referer('sliderberg_plugin_action', '_ajax_nonce', false)) {
-        wp_send_json_error(array('message' => 'Security check failed'));
-    }
-
-    // Check user capabilities
-    if (!current_user_can('activate_plugins')) {
-        wp_send_json_error(array('message' => 'You do not have permission to activate plugins'));
-    }
-
-    // Get plugin slug with strict validation
-    $plugin = isset($_POST['plugin']) ? sanitize_text_field(wp_unslash($_POST['plugin'])) : '';
-    
-    // Validate plugin slug format (alphanumeric and hyphens only)
-    if (!preg_match('/^[a-z0-9\-]+$/', $plugin)) {
-        wp_send_json_error(array('message' => 'Invalid plugin slug format'));
-    }
-    
-    if (empty($plugin) || strlen($plugin) > 50) {
-        wp_send_json_error(array('message' => 'Plugin slug is required and must be less than 50 characters'));
-    }
-    
-    // Validate plugin is in whitelist
-    if (!sliderberg_is_allowed_plugin($plugin)) {
-        wp_send_json_error(array('message' => 'Plugin not allowed'));
-    }
-
-    // Validate plugin path to prevent directory traversal
-    $plugin_file = $plugin . '/' . $plugin . '.php';
-    if (strpos($plugin_file, '..') !== false || strpos($plugin_file, './') !== false || strpos($plugin_file, '\\') !== false) {
-        wp_send_json_error(array('message' => 'Invalid plugin path'));
-    }
-    
-    // Additional check: verify the plugin file exists in the correct location
-    $full_plugin_path = WP_PLUGIN_DIR . '/' . $plugin_file;
-    if (!file_exists($full_plugin_path)) {
-        wp_send_json_error(array('message' => 'Plugin file not found'));
-    }
-
-    // Activate plugin
-    $result = activate_plugin($plugin . '/' . $plugin . '.php');
-
-    if (is_wp_error($result)) {
-        wp_send_json_error(array('message' => $result->get_error_message()));
-    }
-
-    wp_send_json_success();
-}
-add_action('wp_ajax_sliderberg_activate_plugin', 'sliderberg_activate_plugin'); 
