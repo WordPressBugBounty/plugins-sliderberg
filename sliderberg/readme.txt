@@ -1,9 +1,9 @@
-=== Slider & Carousel Block by Sliderberg ===
+=== Slider Block by Sliderberg - WordPress Slider & Carousel Plugin for Gutenberg ===
 Contributors: imtiazrayhan, dotcamp, farhanshafi
 Tags: slider, carousel, text slider, block, gutenberg
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 1.0.9
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,11 @@ Yes, carousel mode fully supports infinite loop scrolling, allowing your content
 8. Testimonials Slider
 
 == Changelog ==
+
+= 1.2.0 =
+
+* FIX: Slider now works correctly after using the browser back button on desktop (Chrome, Brave, Safari).
+* FIX: Slide background images no longer disappear when navigating to a linked slide.
 
 = 1.0.9 =
 
