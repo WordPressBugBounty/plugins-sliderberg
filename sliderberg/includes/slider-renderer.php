@@ -217,6 +217,8 @@ function sliderberg_build_swiper_config( $attrs ) {
  * @return string HTML output.
  */
 function render_sliderberg_slider_block( $attributes, $content ) {
+    sliderberg_enqueue_view_assets();
+
     $attributes = apply_filters( 'sliderberg_slider_attributes', $attributes );
 
     $hide_nav  = ! empty( $attributes['hideNavigation'] );

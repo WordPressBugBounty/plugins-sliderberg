@@ -1,9 +1,9 @@
-=== Slider Block by Sliderberg - WordPress Slider & Carousel Plugin for Gutenberg ===
+=== Slider Block by Sliderberg - Slider & Carousel Plugin for Block Editor ===
 Contributors: imtiazrayhan, dotcamp, farhanshafi
 Tags: slider, carousel, text slider, block, gutenberg
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 1.2.0
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,6 +136,15 @@ Yes, carousel mode fully supports infinite loop scrolling, allowing your content
 
 == Changelog ==
 
+= 1.2.2 =
+
+* FIX: Carousel previews now use the correct desktop, tablet, and mobile settings when the block editor viewport changes.
+* FIX: Slider minimum height, navigation arrows, and pagination dots now render consistently in the editor and on the frontend.
+
+= 1.2.1 =
+
+* FIX: Carousel slides no longer stack vertically on the frontend when the slider is placed inside a synced pattern, template part, or query loop.
+
 = 1.2.0 =
 
 * FIX: Slider now works correctly after using the browser back button on desktop (Chrome, Brave, Safari).
@@ -229,4 +238,4 @@ Yes, carousel mode fully supports infinite loop scrolling, allowing your content
 
 == Privacy Policy ==
 
-Sliderberg does not collect any personal data. 
+Sliderberg does not collect any personal data.

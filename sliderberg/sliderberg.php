@@ -3,7 +3,7 @@
  * Plugin Name: Sliderberg
  * Plugin URI: https://sliderberg.com/
  * Description: Slider Block For the Block Editor (Gutenberg). Slide Anything With Ease.
- * Version: 1.2.0
+ * Version: 1.2.2
  * Author: DotCamp
  * Author URI: https://dotcamp.com/
  * License: GPL v2 or later
@@ -18,7 +18,7 @@ if (!defined('WPINC')) {
 }
 
 // Define plugin constants
-define( 'SLIDERBERG_VERSION', '1.2.0' );
+define( 'SLIDERBERG_VERSION', '1.2.2' );
 define('SLIDERBERG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SLIDERBERG_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -77,9 +77,8 @@ require_once SLIDERBERG_PLUGIN_DIR . 'includes/class-review-handler.php';
 function sliderberg_init() {
     
     // Version assets by file modification time to avoid cache issues
-    $style_version  = file_exists( SLIDERBERG_PLUGIN_DIR . 'build/style-index.css' ) ? filemtime( SLIDERBERG_PLUGIN_DIR . 'build/style-index.css' ) : SLIDERBERG_VERSION;
     $editor_version = file_exists( SLIDERBERG_PLUGIN_DIR . 'build/index.css' ) ? filemtime( SLIDERBERG_PLUGIN_DIR . 'build/index.css' ) : SLIDERBERG_VERSION;
-    $view_version   = file_exists( SLIDERBERG_PLUGIN_DIR . 'build/view.js' ) ? filemtime( SLIDERBERG_PLUGIN_DIR . 'build/view.js' ) : SLIDERBERG_VERSION;
+    $style_version = file_exists( SLIDERBERG_PLUGIN_DIR . 'build/style-index.css' ) ? filemtime( SLIDERBERG_PLUGIN_DIR . 'build/style-index.css' ) : SLIDERBERG_VERSION;
     $editor_js_version = file_exists( SLIDERBERG_PLUGIN_DIR . 'build/index.js' ) ? filemtime( SLIDERBERG_PLUGIN_DIR . 'build/index.js' ) : SLIDERBERG_VERSION;
 
     // Load editor script dependencies from asset file
@@ -99,7 +98,8 @@ function sliderberg_init() {
         true
     );
 
-    // Register block styles
+    // Register shared styles first so block.json can load them on the
+    // frontend and inside the editor iframe.
     wp_register_style(
         'sliderberg-style',
         SLIDERBERG_PLUGIN_URL . 'build/style-index.css',
@@ -107,32 +107,17 @@ function sliderberg_init() {
         $style_version
     );
 
-    // Register editor styles
+    // Register editor-only styles after the shared styles.
     wp_register_style(
         'sliderberg-editor',
         SLIDERBERG_PLUGIN_URL . 'build/index.css',
-        array(),
+        array( 'sliderberg-style' ),
         $editor_version
     );
 
-    // Register view script and styles (includes Swiper CSS)
-    $view_css_version = file_exists( SLIDERBERG_PLUGIN_DIR . 'build/view.css' ) ? filemtime( SLIDERBERG_PLUGIN_DIR . 'build/view.css' ) : SLIDERBERG_VERSION;
+    // The frontend view script is registered and enqueued on demand in
+    // sliderberg_enqueue_view_assets(), called by the render callback.
 
-    wp_register_style(
-        'sliderberg-view',
-        SLIDERBERG_PLUGIN_URL . 'build/view.css',
-        array(),
-        $view_css_version
-    );
-
-    wp_register_script(
-        'sliderberg-view',
-        SLIDERBERG_PLUGIN_URL . 'build/view.js',
-        array(),
-        $view_version,
-        true
-    );
-    
     // Register blocks AFTER assets are registered
     // Register slider block with PHP rendering
     sliderberg_register_slider_block();
@@ -190,17 +175,41 @@ function sliderberg_editor_assets() {
 }
 add_action( 'enqueue_block_editor_assets', 'sliderberg_editor_assets' );
 
-// Enqueue frontend assets
-function sliderberg_frontend_assets() {
-    // Only enqueue if we have sliderberg blocks on the page
-    if (has_block('sliderberg/sliderberg')) {
-        wp_enqueue_style('sliderberg-style');
-        wp_enqueue_style('sliderberg-view');
-        wp_enqueue_script('sliderberg-view');
-        
-        // Pro add-ons can enqueue wp-hooks here to enable frontend filters:
-        // wp_enqueue_script('wp-hooks');
-    }
-}
-add_action('wp_enqueue_scripts', 'sliderberg_frontend_assets');
+/**
+ * Register and enqueue the frontend view assets (Swiper CSS + the vanilla
+ * Swiper initializer, plus the block's own frontend styles).
+ *
+ * Called directly from render_sliderberg_slider_block() rather than hooked to
+ * wp_enqueue_scripts behind has_block('sliderberg/sliderberg') — has_block()
+ * only scans the current post's raw content, so it misses the block when
+ * it's rendered from a synced pattern, template part, query loop, or widget.
+ * Calling this from the render callback guarantees it runs whenever the
+ * block actually renders, wherever it was placed. wp_enqueue_style()/
+ * wp_enqueue_script() are no-ops on repeat calls, so this is safe to call
+ * once per slider on pages with multiple sliders.
+ */
+function sliderberg_enqueue_view_assets() {
+    wp_enqueue_style(
+        'sliderberg-style',
+        SLIDERBERG_PLUGIN_URL . 'build/style-index.css',
+        array(),
+        filemtime( SLIDERBERG_PLUGIN_DIR . 'build/style-index.css' )
+    );
 
+    wp_enqueue_style(
+        'sliderberg-view',
+        SLIDERBERG_PLUGIN_URL . 'build/view.css',
+        array(),
+        filemtime( SLIDERBERG_PLUGIN_DIR . 'build/view.css' )
+    );
+
+    $view_asset = require SLIDERBERG_PLUGIN_DIR . 'build/view.asset.php';
+
+    wp_enqueue_script(
+        'sliderberg-view',
+        SLIDERBERG_PLUGIN_URL . 'build/view.js',
+        $view_asset['dependencies'],
+        $view_asset['version'],
+        true
+    );
+}

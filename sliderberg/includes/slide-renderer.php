@@ -31,10 +31,12 @@ function sliderberg_register_slide_block() {
  * @return string HTML output.
  */
 function render_sliderberg_slide_block( $attributes, $content, $block ) {
-    // Min height: use slide's own value if not default, otherwise inherit from parent context
+    // The slider minimum height is the floor for every slide. A slide-specific
+    // value can make the slide taller, but cannot make it shorter than the
+    // parent slider and expose empty space below it.
     $parent_min_height = isset( $block->context['sliderberg/minHeight'] ) ? absint( $block->context['sliderberg/minHeight'] ) : 400;
     $slide_min_height  = isset( $attributes['minHeight'] ) ? absint( $attributes['minHeight'] ) : 400;
-    $effective_height  = ( $slide_min_height !== 400 ) ? $slide_min_height : $parent_min_height;
+    $effective_height  = ( $slide_min_height !== 400 ) ? max( $slide_min_height, $parent_min_height ) : $parent_min_height;
     $transition_effect = isset( $block->context['sliderberg/transitionEffect'] ) ? $block->context['sliderberg/transitionEffect'] : 'slide';
     $is_parallax       = 'parallax' === $transition_effect;
 
