@@ -21,6 +21,42 @@ function sliderberg_is_transition_effect_allowed_in_carousel( $transition_effect
 }
 
 /**
+ * Resolve the effective layout mode from block attributes.
+ *
+ * Falls back to the legacy `isCarouselMode` boolean for content saved before
+ * `mode` replaced it. WordPress's WP_Block_Type::prepare_attributes_for_render()
+ * leaves attribute keys it doesn't recognize untouched, so `isCarouselMode`
+ * still reaches this function for old posts even though it's no longer
+ * declared in block.json.
+ *
+ * Note `isCarouselMode` is only present when it was explicitly `true` —
+ * WordPress omits attributes that equal their schema default (`false`) from
+ * saved markup, so the far more common "always was Slider mode" case has
+ * neither `mode` nor `isCarouselMode` at all. `$content` (the already-
+ * rendered inner slide blocks) is what tells that apart from a genuinely
+ * fresh, never-picked chooser block, which has no inner blocks yet.
+ *
+ * @param array  $attrs   Block attributes.
+ * @param string $content Rendered inner block content, if available.
+ * @return string 'slider', 'carousel', or '' if no layout has been picked.
+ */
+function sliderberg_resolve_mode( $attrs, $content = '' ) {
+    if ( ! empty( $attrs['mode'] ) ) {
+        return $attrs['mode'];
+    }
+
+    if ( isset( $attrs['isCarouselMode'] ) ) {
+        return $attrs['isCarouselMode'] ? 'carousel' : 'slider';
+    }
+
+    if ( '' !== trim( $content ) ) {
+        return 'slider';
+    }
+
+    return '';
+}
+
+/**
  * Register the slider block with PHP rendering.
  */
 function sliderberg_register_slider_block() {
@@ -124,14 +160,16 @@ function sliderberg_get_transition_effect_config( $transition_effect, $is_carous
 /**
  * Build the Swiper configuration array from block attributes.
  *
- * @param array $attrs Block attributes.
+ * @param array  $attrs   Block attributes.
+ * @param string $content Rendered inner block content, if available (see
+ *                        sliderberg_resolve_mode() for why this matters).
  * @return array Swiper config.
  */
-function sliderberg_build_swiper_config( $attrs ) {
+function sliderberg_build_swiper_config( $attrs, $content = '' ) {
     $attrs = apply_filters( 'sliderberg_slider_attributes', $attrs );
 
     $transition_effect = isset( $attrs['transitionEffect'] ) ? $attrs['transitionEffect'] : 'slide';
-    $is_carousel      = ! empty( $attrs['isCarouselMode'] );
+    $is_carousel      = 'carousel' === sliderberg_resolve_mode( $attrs, $content );
     $slides_to_show   = isset( $attrs['slidesToShow'] ) ? absint( $attrs['slidesToShow'] ) : 3;
     $slides_to_scroll = isset( $attrs['slidesToScroll'] ) ? absint( $attrs['slidesToScroll'] ) : 1;
     $slide_spacing    = isset( $attrs['slideSpacing'] ) ? absint( $attrs['slideSpacing'] ) : 20;
@@ -217,9 +255,17 @@ function sliderberg_build_swiper_config( $attrs ) {
  * @return string HTML output.
  */
 function render_sliderberg_slider_block( $attributes, $content ) {
-    sliderberg_enqueue_view_assets();
-
     $attributes = apply_filters( 'sliderberg_slider_attributes', $attributes );
+
+    // No layout picked yet — a genuinely fresh, never-picked chooser block
+    // has no inner slides at all, so nothing to render. (Legacy content
+    // saved before `mode` existed always has real slide content and is
+    // handled inside sliderberg_resolve_mode().)
+    if ( '' === sliderberg_resolve_mode( $attributes, $content ) ) {
+        return '';
+    }
+
+    sliderberg_enqueue_view_assets();
 
     $hide_nav  = ! empty( $attributes['hideNavigation'] );
     $hide_dots = ! empty( $attributes['hideDots'] );
@@ -229,8 +275,8 @@ function render_sliderberg_slider_block( $attributes, $content ) {
     $nav_color    = isset( $attributes['navigationColor'] ) ? esc_attr( $attributes['navigationColor'] ) : '#ffffff';
     $nav_bg_color = isset( $attributes['navigationBgColor'] ) ? esc_attr( $attributes['navigationBgColor'] ) : 'rgba(0, 0, 0, 0.5)';
     $nav_opacity  = isset( $attributes['navigationOpacity'] ) ? floatval( $attributes['navigationOpacity'] ) : 1;
-    $dot_color    = isset( $attributes['dotColor'] ) ? esc_attr( $attributes['dotColor'] ) : '#6c757d';
-    $dot_active   = isset( $attributes['dotActiveColor'] ) ? esc_attr( $attributes['dotActiveColor'] ) : '#ffffff';
+    $dot_color    = isset( $attributes['dotColor'] ) ? esc_attr( $attributes['dotColor'] ) : 'rgba(0, 0, 0, 0.4)';
+    $dot_active   = isset( $attributes['dotActiveColor'] ) ? esc_attr( $attributes['dotActiveColor'] ) : '#000000';
     $min_height   = isset( $attributes['minHeight'] ) ? absint( $attributes['minHeight'] ) : 400;
 
     // Navigation shape and size
@@ -333,7 +379,7 @@ function render_sliderberg_slider_block( $attributes, $content ) {
     ) );
 
     // Build Swiper config JSON
-    $swiper_config = sliderberg_build_swiper_config( $attributes );
+    $swiper_config = sliderberg_build_swiper_config( $attributes, $content );
     $swiper_json   = wp_json_encode( $swiper_config );
 
     // Navigation buttons

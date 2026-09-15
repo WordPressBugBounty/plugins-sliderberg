@@ -1,0 +1,409 @@
+/**
+ * Slider block shared styles (editor + frontend)
+ * These styles apply on both the frontend and inside the block editor.
+ */
+
+.wp-block-sliderberg-sliderberg {
+  .sliderberg-swiper-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  .sliderberg-swiper,
+  .sliderberg-swiper-editor {
+    position: relative;
+    width: 100%;
+    min-height: var(--sliderberg-min-height, 400px);
+    overflow: hidden;
+  }
+
+  // Swiper wrapper needs full height
+  .swiper-wrapper {
+    align-items: stretch;
+  }
+
+  // --- Navigation Buttons ---
+  .swiper-button-prev,
+  .swiper-button-next {
+    &::after {
+      display: none;
+    }
+    background: var(--swiper-navigation-background-color, rgba(0, 0, 0, 0.5));
+    border: none;
+    border-radius: 50%;
+    color: var(--swiper-navigation-color, #fff);
+    width: 40px;
+    height: 40px;
+    opacity: var(--sliderberg-nav-opacity, 1);
+    cursor: pointer;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+    padding: 0;
+
+    .swiper-navigation-icon {
+      width: 12px;
+      height: 12px;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &.swiper-button-disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+  }
+
+  // Navigation shape: square
+  &.sliderberg-nav-square {
+    .swiper-button-prev,
+    .swiper-button-next {
+      border-radius: 4px;
+    }
+  }
+
+  // Navigation size: small
+  &.sliderberg-nav-small {
+    .swiper-button-prev,
+    .swiper-button-next {
+      width: 32px;
+      height: 32px;
+
+      .swiper-navigation-icon {
+        width: 10px;
+        height: 10px;
+      }
+    }
+  }
+
+  // Navigation size: large
+  &.sliderberg-nav-large {
+    .swiper-button-prev,
+    .swiper-button-next {
+      width: 52px;
+      height: 52px;
+
+      .swiper-navigation-icon {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  // Navigation size: custom (via SpacingControl)
+  &.sliderberg-nav-custom-size {
+    .swiper-button-prev,
+    .swiper-button-next {
+      width: var(--sliderberg-nav-btn-size, 40px);
+      height: var(--sliderberg-nav-btn-size, 40px);
+
+      .swiper-navigation-icon {
+        width: calc(var(--sliderberg-nav-btn-size, 40px) * 0.6);
+        height: calc(var(--sliderberg-nav-btn-size, 40px) * 0.6);
+      }
+    }
+
+    // Adjust grouped arrow offsets for custom size
+    &.sliderberg-nav-h-left .swiper-button-next {
+      left: calc(2% + var(--sliderberg-nav-btn-size, 40px) + 10px);
+    }
+
+    &.sliderberg-nav-h-right .swiper-button-prev {
+      right: calc(2% + var(--sliderberg-nav-btn-size, 40px) + 10px);
+    }
+  }
+
+  // =============================================
+  // --- Arrows Horizontal Position (both arrows together) ---
+  // Default: space-between (prev=left 3%, next=right 3%)
+  // =============================================
+
+  // space-between = Swiper default with 3% edge offset
+  &.sliderberg-nav-h-space-between {
+    .swiper-button-prev {
+      left: 2%;
+      right: auto;
+    }
+
+    .swiper-button-next {
+      right: 2%;
+      left: auto;
+    }
+  }
+
+  // Both arrows grouped left
+  &.sliderberg-nav-h-left {
+    .swiper-button-prev,
+    .swiper-button-next {
+      left: 2%;
+      right: auto;
+    }
+
+    .swiper-button-next {
+      left: calc(2% + 50px);
+    }
+
+    &.sliderberg-nav-small .swiper-button-next {
+      left: calc(2% + 36px);
+    }
+
+    &.sliderberg-nav-large .swiper-button-next {
+      left: calc(2% + 62px);
+    }
+  }
+
+  // Both arrows grouped center
+  &.sliderberg-nav-h-center {
+    .swiper-button-prev,
+    .swiper-button-next {
+      left: 50%;
+      right: auto;
+    }
+
+    .swiper-button-prev {
+      transform: translateX(calc(-100% - 8px));
+    }
+
+    .swiper-button-next {
+      transform: translateX(8px);
+    }
+  }
+
+  // Both arrows grouped right
+  &.sliderberg-nav-h-right {
+    .swiper-button-prev,
+    .swiper-button-next {
+      left: auto;
+    }
+
+    .swiper-button-prev {
+      right: calc(2% + 50px);
+    }
+
+    .swiper-button-next {
+      right: 2%;
+    }
+
+    &.sliderberg-nav-small .swiper-button-prev {
+      right: calc(2% + 36px);
+    }
+
+    &.sliderberg-nav-large .swiper-button-prev {
+      right: calc(2% + 62px);
+    }
+  }
+
+  // =============================================
+  // --- Arrows Vertical Position (both arrows together) ---
+  // Default: center (Swiper native top: 50%)
+  // =============================================
+
+  &.sliderberg-nav-v-top {
+    .swiper-button-prev,
+    .swiper-button-next {
+      top: 10%;
+      bottom: auto;
+    }
+  }
+
+  // center = Swiper default (top: 50%, transform: translateY(-50%))
+
+  &.sliderberg-nav-v-bottom {
+    .swiper-button-prev,
+    .swiper-button-next {
+      top: auto;
+      bottom: 10%;
+    }
+  }
+
+  // =============================================
+  // --- Pagination Horizontal Position ---
+  // =============================================
+
+  &.sliderberg-dots-h-left .swiper-pagination {
+    text-align: left;
+  }
+
+  // center = default (text-align: center)
+
+  &.sliderberg-dots-h-right .swiper-pagination {
+    text-align: right;
+  }
+
+  // =============================================
+  // --- Pagination Vertical Position ---
+  // Default: bottom (relative, below slider)
+  // =============================================
+
+  &.sliderberg-dots-v-top .swiper-pagination {
+    position: absolute !important;
+    top: 8px !important;
+    bottom: auto !important;
+    left: 0 !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+    z-index: 10;
+  }
+
+  // bottom = default (position: relative, margin-top: 12px)
+
+  // =============================================
+  // --- Outside Arrows ---
+  // Uses flexbox: [prev] [swiper flex:1] [next], pagination on its own
+  // full-width row below. No padding on the wrap means Swiper measures
+  // its container correctly and the layout never exceeds the parent width.
+  // =============================================
+  &.sliderberg-nav-outside {
+    .sliderberg-swiper-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sliderberg-swiper,
+    .sliderberg-swiper-editor {
+      flex: 1;
+      min-width: 0; // prevent flex item from overflowing
+      order: 1;
+    }
+
+    // Override absolute positioning from h/v position classes
+    .swiper-button-prev {
+      position: static;
+      top: auto;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      transform: none;
+      order: 0;
+      flex-shrink: 0;
+    }
+
+    .swiper-button-next {
+      position: static;
+      top: auto;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      transform: none;
+      order: 2;
+      flex-shrink: 0;
+    }
+
+    // Pagination wraps to its own full-width row below the flex items
+    .swiper-pagination {
+      order: 3;
+      width: 100%;
+      margin-top: 4px;
+    }
+  }
+
+  // =============================================
+  // --- Free Position Mode (per-element) ---
+  // =============================================
+  &.sliderberg-nav-free {
+    .swiper-button-prev {
+      position: absolute;
+      top: var(--sliderberg-prev-free-y, 50%);
+      left: var(--sliderberg-prev-free-x, 3%);
+      right: auto;
+      transform: translate(-50%, -50%);
+    }
+
+    .swiper-button-next {
+      position: absolute;
+      top: var(--sliderberg-next-free-y, 50%);
+      left: var(--sliderberg-next-free-x, 97%);
+      right: auto;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &.sliderberg-nav-free {
+    .swiper-pagination {
+      position: absolute !important;
+      top: var(--sliderberg-dots-free-y, 90%) !important;
+      left: var(--sliderberg-dots-free-x, 50%) !important;
+      bottom: auto !important;
+      width: auto !important;
+      margin-top: 0 !important;
+      transform: translate(-50%, -50%) !important;
+      z-index: 10;
+    }
+  }
+
+  // --- Transition Easing ---
+  .swiper-wrapper {
+    transition-timing-function: var(--sliderberg-easing, ease) !important;
+  }
+
+  // --- Pagination ---
+  .swiper-pagination {
+    position: relative;
+    bottom: auto;
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  .swiper-pagination-bullet {
+    background: var(--swiper-pagination-bullet-inactive-color, #6c757d);
+    opacity: var(--swiper-pagination-bullet-inactive-opacity, 1);
+    width: 10px;
+    height: 10px;
+    margin: 0 4px;
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+
+    &-active {
+      background: var(--swiper-pagination-color, #fff);
+      transform: scale(1.2);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  // --- Slides ---
+  .swiper-slide {
+    box-sizing: border-box;
+    height: auto; // Let content / min-height control height
+  }
+
+  // --- Slide internals (frontend) ---
+  .sliderberg-slide {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sliderberg-slide-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .sliderberg-slide-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .sliderberg-slide-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

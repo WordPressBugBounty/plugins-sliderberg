@@ -1,9 +1,9 @@
-=== Slider Block by Sliderberg - Slider & Carousel Plugin for Block Editor ===
+=== Slider Block by Sliderberg - WordPress Slider & Carousel Plugin for Gutenberg ===
 Contributors: imtiazrayhan, dotcamp, farhanshafi
 Tags: slider, carousel, text slider, block, gutenberg
 Requires at least: 5.8
-Tested up to: 7.0
-Stable tag: 1.2.2
+Tested up to: 7.1
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,16 @@ Yes, carousel mode fully supports infinite loop scrolling, allowing your content
 8. Testimonials Slider
 
 == Changelog ==
+
+= 1.2.3 =
+
+* NEW: Added a Sliderberg layout picker so choosing between Slider and Carousel happens right when you insert the block; Slider and Carousel now also show up as their own options in the block inserter.
+* FIX: The active pagination dot no longer disappears against light backgrounds.
+* FIX: A slide's minimum height no longer leaves empty space below it when the slider's own minimum height is increased.
+* FIX: Content Position no longer places content in the wrong corner; it's now a toolbar control that matches the Cover block.
+* IMPROVED: Carousel no longer shows several empty slide background panels at once in the editor — only the active slide's panel is shown, matching the Columns block.
+* IMPROVED: Carousel navigation arrows are positioned outside the slider by default.
+* Updated the bundled Freemius SDK to 2.13.4.
 
 = 1.2.2 =
 

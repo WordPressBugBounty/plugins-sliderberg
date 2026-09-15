@@ -3,10 +3,10 @@
   "apiVersion": 3,
   "name": "sliderberg/sliderberg",
   "version": "1.0.0",
-  "title": "SliderBerg",
+  "title": "Sliderberg",
   "category": "widgets",
   "icon": "slides",
-  "description": "Add a beautiful slider to your content.",
+  "description": "Create sliders and carousels right inside the block editor.",
   "providesContext": {
     "sliderberg/minHeight": "minHeight",
     "sliderberg/transitionEffect": "transitionEffect"
@@ -169,11 +169,11 @@
     },
     "dotColor": {
       "type": "string",
-      "default": "#6c757d"
+      "default": "rgba(0, 0, 0, 0.4)"
     },
     "dotActiveColor": {
       "type": "string",
-      "default": "#ffffff"
+      "default": "#000000"
     },
     "hideDots": {
       "type": "boolean",
@@ -195,9 +195,9 @@
       "type": "string",
       "default": "px"
     },
-    "isCarouselMode": {
-      "type": "boolean",
-      "default": false
+    "mode": {
+      "type": "string",
+      "default": ""
     },
     "slidesToShow": {
       "type": "number",

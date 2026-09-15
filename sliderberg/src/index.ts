@@ -1,4 +1,7 @@
-// src/index.ts
+/**
+ * Editor entry point.
+ * Registers all blocks.
+ */
 
-// Register all blocks
-import './blocks/slider/index.tsx';
+import './blocks/slider';
+import './blocks/slide';

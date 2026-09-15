@@ -104,11 +104,14 @@ function render_sliderberg_slide_block( $attributes, $content, $block ) {
         $position = 'center-center';
     }
 
+    // The content wrapper below uses flex-direction:column, so align-items
+    // controls the horizontal axis and justify-content controls the
+    // vertical axis.
     $parts          = explode( '-', $position );
     $vertical       = isset( $parts[0] ) ? $parts[0] : 'center';
     $horizontal     = isset( $parts[1] ) ? $parts[1] : 'center';
-    $align_items    = 'center' === $vertical ? 'center' : ( 'top' === $vertical ? 'flex-start' : 'flex-end' );
-    $justify_content = 'center' === $horizontal ? 'center' : ( 'left' === $horizontal ? 'flex-start' : 'flex-end' );
+    $align_items    = 'center' === $horizontal ? 'center' : ( 'left' === $horizontal ? 'flex-start' : 'flex-end' );
+    $justify_content = 'center' === $vertical ? 'center' : ( 'top' === $vertical ? 'flex-start' : 'flex-end' );
 
     // Combine all slide styles
     $base_slide_styles = array_merge(

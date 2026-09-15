@@ -1,63 +1,74 @@
 /**
- * Slider Block Registration
- *
- * Uses block.json as the single source of truth for:
- * - Block name, title, description, category, icon
- * - Supports configuration
- * - All block attributes
- *
- * This file adds:
- * - Edit and Save components
- * - Deprecations
- * - Pro plugin attribute extensions via filter
+ * Slider block registration.
  */
 
-import { registerBlockType } from '@wordpress/blocks';
-import { InnerBlocks } from '@wordpress/block-editor';
-import { applyFilters } from '@wordpress/hooks';
-import * as React from 'react';
+import { registerBlockType, registerBlockVariation } from "@wordpress/blocks";
+import { __ } from "@wordpress/i18n";
 
-// Import block metadata from block.json (single source of truth)
-import metadata from './block.json';
+import metadata from "./block.json";
+import Edit from "./edit";
+import Save from "./save";
+import { carouselIcon, sliderbergIcon } from "./icons";
 
-// Import styles
-import './style.css';
-import './editor.css';
+import "./style.scss";
 
-// Import components
-import { Edit } from './edit';
+// v1 attribute shape, before `mode` replaced the boolean `isCarouselMode`.
+// Kept only so existing saved sliders migrate cleanly — see `migrate()` below.
+const { mode: _mode, ...legacyAttributes } = (metadata as any).attributes;
+const deprecatedAttributes = {
+  ...legacyAttributes,
+  isCarouselMode: { type: "boolean", default: false },
+};
 
-// Import deprecations
-import deprecated from './deprecated';
+registerBlockType(metadata.name, {
+  ...(metadata as any),
+  icon: sliderbergIcon,
+  edit: Edit,
+  save: Save,
+  deprecated: [
+    {
+      attributes: deprecatedAttributes,
+      save: Save,
+      // Only migrate content saved before `mode` existed — never a block
+      // that's already been through this schema (mode present) or a brand
+      // new, never-picked chooser block (neither attribute present).
+      isEligible: (attributes: Record<string, any>) =>
+        attributes.mode === undefined && attributes.isCarouselMode !== undefined,
+      migrate(attributes: Record<string, any>) {
+        const { isCarouselMode, ...rest } = attributes;
+        return {
+          ...rest,
+          mode: isCarouselMode ? "carousel" : "slider",
+        };
+      },
+    },
+  ],
+});
 
-// Import slide block
-import '../slide';
+registerBlockVariation("sliderberg/sliderberg", {
+  name: "slider",
+  title: __("Slider", "sliderberg"),
+  description: __(
+    "Display slides one at a time, with blocks added to each slide.",
+    "sliderberg",
+  ),
+  icon: "format-image",
+  attributes: { mode: "slider" },
+  isActive: ["mode"],
+  scope: ["inserter", "transform"],
+});
 
-// Allow pro features to add type-specific attributes
-const typeAttributes = applyFilters(
-	'sliderberg.blockAttributes',
-	{}
-) as Record< string, any >;
-
-/**
- * Register the main slider block
- *
- * WordPress merges block.json metadata (registered via PHP) with this JS registration.
- * The block.json provides: name, title, description, category, icon, supports, attributes
- * This file provides: edit, save, deprecated, and any runtime attribute extensions
- */
-registerBlockType( metadata.name, {
-	// Spread metadata from block.json
-	...metadata,
-	// Merge attributes: block.json attributes + pro plugin extensions
-	attributes: {
-		...metadata.attributes,
-		...typeAttributes,
-	},
-	// Components (must be defined in JS)
-	edit: Edit,
-	save: () => {
-		return <InnerBlocks.Content />;
-	},
-	deprecated,
-} );
+registerBlockVariation("sliderberg/sliderberg", {
+  name: "carousel",
+  title: __("Carousel", "sliderberg"),
+  description: __(
+    "Display several slides at once in a scrollable row.",
+    "sliderberg",
+  ),
+  icon: carouselIcon,
+  // Carousel shows multiple slides at once, so arrows overlaying the slides
+  // read better placed outside by default (Slider keeps the overlay default).
+  attributes: { mode: "carousel", navOutside: true },
+  isActive: ["mode"],
+  scope: ["inserter", "transform"],
+});

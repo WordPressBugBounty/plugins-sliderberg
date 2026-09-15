@@ -1,226 +1,343 @@
 /**
- * SliderBerg Frontend Entry Point - Rewritten
+ * SliderBerg Frontend Entry Point
  *
- * Clean, modern initialization code for frontend sliders
- * Uses modular controller architecture with separate animation and event handlers
- *
- * Features:
- * - Automatic slider detection and initialization
- * - Pro plugin extensibility via WordPress hooks
- * - AJAX content compatibility
- * - jQuery integration for legacy themes
- * - Proper cleanup on page unload
- *
- * @since 1.0.0 Original implementation
- * @since 2.0.0 Rewritten with modular architecture, improved initialization
+ * Initializes Swiper instances from data-swiper-data attributes
+ * rendered by the PHP slider-renderer.
  */
 
-import { SliderBergController } from './frontend/slider-controller';
+import Swiper from "swiper";
 import {
-	EffectRegistry,
-	BaseEffect,
-	type Effect,
-	type EffectConstructor,
-	type Direction,
-} from './frontend/animation-handler';
+  Navigation,
+  Pagination,
+  Autoplay,
+  EffectFade,
+  EffectCreative,
+  Keyboard,
+  A11y,
+} from "swiper/modules";
+import type { SwiperModule, SwiperOptions } from "swiper/types";
 
-// Global type declarations
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-fade";
+import "swiper/css/effect-creative";
+
+// Extend Window interface for public API and WP hooks
 declare const jQuery: any;
 declare global {
-	interface Window {
-		SliderBerg: {
-			/** Initialize all sliders on the page */
-			init: () => void;
-			/** Destroy all slider instances */
-			destroyAll: () => void;
-			/** Get a slider instance by its DOM element */
-			getInstance: (element: Element) => SliderBergController | null;
-			/** Get all slider instances */
-			getInstances: () => Map<string, SliderBergController>;
-
-			// Convenience methods (operate on element directly)
-			/** Navigate to a specific slide */
-			goTo: (element: Element, index: number) => void;
-			/** Navigate to next slide */
-			next: (element: Element) => void;
-			/** Navigate to previous slide */
-			prev: (element: Element) => void;
-			/** Pause autoplay */
-			pause: (element: Element) => void;
-			/** Resume autoplay */
-			play: (element: Element) => void;
-
-			/** Effect registry for custom transition effects */
-			EffectRegistry: typeof EffectRegistry;
-			/** Base class for creating custom effects */
-			BaseEffect: typeof BaseEffect;
-		};
-		wp?: {
-			hooks?: {
-				applyFilters: (
-					filter: string,
-					value: any,
-					...args: any[]
-				) => any;
-			};
-		};
-	}
+  interface Window {
+    SliderBerg: {
+      init: () => void;
+      destroyAll: () => void;
+      getInstance: (element: Element) => Swiper | undefined;
+      getInstances: () => Map<Element, Swiper>;
+      next: (element: Element) => void;
+      prev: (element: Element) => void;
+      goTo: (element: Element, index: number) => void;
+      pause: (element: Element) => void;
+      play: (element: Element) => void;
+    };
+    wp?: {
+      hooks?: {
+        applyFilters: (filter: string, value: any, ...args: any[]) => any;
+      };
+    };
+  }
 }
 
-// Export types for TypeScript consumers
-export type { Effect, EffectConstructor, Direction };
-export { EffectRegistry, BaseEffect };
+/** All active Swiper instances keyed by their container element */
+const instances = new Map<Element, Swiper>();
 
 /**
- * Initialize all SliderBerg sliders on the page
+ * AbortControllers for slide-link DOM listeners, keyed by container.
+ * Aborting removes all associated click/keydown handlers in one call,
+ * preventing duplicate listeners when the slider is reinitialized after
+ * a bfcache restore (back/forward navigation).
+ */
+const slideControllers = new Map<Element, AbortController>();
+
+const defaultModules: SwiperModule[] = [
+  Navigation,
+  Pagination,
+  Autoplay,
+  EffectFade,
+  EffectCreative,
+  Keyboard,
+  A11y,
+];
+
+function applySliderbergFilter<T>(filter: string, value: T, ...args: any[]): T {
+  if (!window.wp?.hooks?.applyFilters) {
+    return value;
+  }
+
+  return window.wp.hooks.applyFilters(filter, value, ...args) as T;
+}
+
+function getSwiperModules(
+  container: HTMLElement,
+  config: SwiperOptions,
+): SwiperModule[] {
+  const modules = applySliderbergFilter(
+    "sliderberg.swiperModules",
+    defaultModules.slice(),
+    container,
+    config,
+  );
+
+  return Array.isArray(modules) ? modules : defaultModules;
+}
+
+/**
+ * Initialize all SliderBerg sliders on the page.
  */
 function initializeSliders(): void {
-	const sliders: NodeListOf< Element > = document.querySelectorAll(
-		'.wp-block-sliderberg-sliderberg'
-	);
+  const containers =
+    document.querySelectorAll<HTMLElement>(".sliderberg-swiper");
 
-	if ( ! sliders.length ) {
-		return;
-	}
+  if (!containers.length) {
+    return;
+  }
 
-	// Allow pro features to extend initialization (only if wp.hooks is available)
-	if ( window.wp?.hooks?.applyFilters ) {
-		const customInit = window.wp.hooks.applyFilters(
-			'sliderberg.frontendInit',
-			null,
-			sliders
-		);
+  // Allow pro features to override initialization entirely
+  if (window.wp?.hooks?.applyFilters) {
+    const customInit = window.wp.hooks.applyFilters(
+      "sliderberg.frontendInit",
+      null,
+      containers,
+    );
+    if (customInit && typeof customInit === "function") {
+      customInit(containers);
+      return;
+    }
+  }
 
-		if ( customInit && typeof customInit === 'function' ) {
-			customInit( sliders );
-			return;
-		}
-	}
+  containers.forEach((container) => {
+    // Skip already-initialized containers
+    if (instances.has(container)) {
+      return;
+    }
 
-	sliders.forEach( ( slider: Element ) => {
-		// Check if already initialized
-		let alreadyInitialized = false;
-		SliderBergController.getInstances().forEach( ( instance ) => {
-			if ( instance.getElements().wrapper === slider ) {
-				alreadyInitialized = true;
-			}
-		} );
+    // Allow pro features to veto individual slider init
+    if (window.wp?.hooks?.applyFilters) {
+      const shouldInit = window.wp.hooks.applyFilters(
+        "sliderberg.beforeSliderInit",
+        true,
+        container,
+      );
+      if (!shouldInit) {
+        return;
+      }
+    }
 
-		if ( ! alreadyInitialized ) {
-			// Allow pro features to modify slider initialization (only if wp.hooks is available)
-			let shouldInit = true;
-			if ( window.wp?.hooks?.applyFilters ) {
-				shouldInit = window.wp.hooks.applyFilters(
-					'sliderberg.beforeSliderInit',
-					true,
-					slider
-				);
-			}
+    // Parse Swiper config from data attribute
+    const dataAttr = container.getAttribute("data-swiper-data");
+    if (!dataAttr) {
+      return;
+    }
 
-			if ( shouldInit ) {
-				SliderBergController.createInstance( slider );
-			}
-		}
-	} );
+    let config: SwiperOptions;
+    try {
+      config = JSON.parse(dataAttr) as SwiperOptions;
+    } catch {
+      return;
+    }
+
+    // Scope navigation/pagination selectors to this container instance.
+    // Both nav buttons and pagination live OUTSIDE the swiper container as
+    // siblings inside .sliderberg-swiper-wrap, so query from the parent.
+    if (config.navigation) {
+      const prevEl =
+        container.parentElement?.querySelector(".swiper-button-prev") ??
+        container.querySelector(".swiper-button-prev");
+      const nextEl =
+        container.parentElement?.querySelector(".swiper-button-next") ??
+        container.querySelector(".swiper-button-next");
+      if (prevEl && nextEl) {
+        config.navigation = { prevEl, nextEl };
+      }
+    }
+    if (config.pagination) {
+      // Pagination is a sibling of the swiper container inside
+      // .sliderberg-swiper-wrap, so query from the parent element.
+      const paginationEl =
+        container.parentElement?.querySelector(".swiper-pagination") ??
+        container.querySelector(".swiper-pagination");
+      if (paginationEl) {
+        config.pagination = {
+          ...config.pagination,
+          el: paginationEl,
+        };
+      }
+    }
+
+    const swiperConfig = applySliderbergFilter(
+      "sliderberg.swiperConfig",
+      config,
+      container,
+    );
+    const modules = getSwiperModules(container, swiperConfig);
+
+    // Create Swiper instance
+    const swiper = new Swiper(container, {
+      modules,
+      ...swiperConfig,
+    });
+
+    instances.set(container, swiper);
+    initSlideLinkHandlers(container, swiper);
+  });
 }
-
-// Keep all your existing initialization and event handling code
-if ( document.readyState === 'loading' ) {
-	document.addEventListener( 'DOMContentLoaded', () =>
-		setTimeout( initializeSliders, 50 )
-	);
-} else {
-	setTimeout( initializeSliders, 50 );
-}
-
-// Keep all existing event listeners and cleanup
-window.addEventListener( 'beforeunload', () => {
-	SliderBergController.destroyAll();
-} );
-
-// Keep existing jQuery integration and content-updated listeners
-document.addEventListener( 'DOMContentLoaded', function () {
-	if ( typeof jQuery !== 'undefined' ) {
-		jQuery( document ).on(
-			'ajaxComplete',
-			function ( event: any, xhr: any, settings: any ) {
-				// Simple check if the response might contain new blocks
-				if (
-					settings.data &&
-					typeof settings.data === 'string' &&
-					settings.data.includes( 'action=load-more' )
-				) {
-					// Example condition
-					setTimeout( initializeSliders, 150 ); // Give a bit more time for content to render
-				} else if (
-					xhr.responseText &&
-					xhr.responseText.includes(
-						'wp-block-sliderberg-sliderberg'
-					)
-				) {
-					setTimeout( initializeSliders, 150 );
-				}
-			}
-		);
-	}
-	document.addEventListener( 'content-updated', () =>
-		setTimeout( initializeSliders, 150 )
-	); // For custom theme events
-} );
 
 /**
- * Public API exposed on window.SliderBerg
+ * Wire up click-to-navigate behaviour for slides that have data-slide-link.
+ * Uses a JS handler rather than wrapping in <a> so nested interactive
+ * elements (buttons, links) continue to work normally.
  *
- * @example
- * // Initialize all sliders
- * SliderBerg.init();
- *
- * // Get instance and control it
- * const element = document.querySelector('.wp-block-sliderberg-sliderberg');
- * const slider = SliderBerg.getInstance(element);
- * slider?.next();
- * slider?.goTo(2);
- * slider?.pause();
- *
- * // Or use convenience methods directly
- * SliderBerg.next(element);
- * SliderBerg.goTo(element, 2);
- * SliderBerg.pause(element);
- *
- * // Register a custom effect
- * class MyEffect extends SliderBerg.BaseEffect {
- *   setupLayout() { ... }
- *   gotoSlide(index, direction) { ... }
- * }
- * SliderBerg.EffectRegistry.register('myEffect', MyEffect);
+ * Listeners are tied to an AbortController stored in slideControllers so they
+ * can be cancelled cleanly on reinit without leaving orphaned handlers on the
+ * DOM nodes.
  */
+function initSlideLinkHandlers(container: HTMLElement, swiper: Swiper): void {
+  const linkedSlides = Array.from(
+    container.querySelectorAll<HTMLElement>(".sliderberg-slide[data-slide-link]"),
+  );
+  if (!linkedSlides.length) return;
+
+  const ac = new AbortController();
+  const { signal } = ac;
+  slideControllers.set(container, ac);
+
+  // Prevent navigation when the user drags to the next slide
+  let isDragging = false;
+  swiper.on("touchStart", () => {
+    isDragging = false;
+  });
+  swiper.on("touchMove", () => {
+    isDragging = true;
+  });
+
+  // Only the active slide should be reachable via Tab
+  const updateTabindex = () => {
+    linkedSlides.forEach((slide) => {
+      slide.tabIndex = slide.classList.contains("swiper-slide-active") ? 0 : -1;
+    });
+  };
+  updateTabindex();
+  swiper.on("slideChange", updateTabindex);
+
+  linkedSlides.forEach((slide) => {
+    const url = slide.dataset.slideLink!;
+    const linkTarget = slide.dataset.slideLinkTarget ?? "_self";
+
+    const navigate = () => {
+      if (linkTarget === "_blank") {
+        window.open(url, "_blank", "noopener,noreferrer");
+      } else {
+        window.location.href = url;
+      }
+    };
+
+    slide.addEventListener(
+      "click",
+      (e) => {
+        if (isDragging) {
+          isDragging = false;
+          return;
+        }
+        // Let clicks on interactive elements through unchanged
+        const clickedEl = e.target as Element;
+        if (
+          clickedEl.closest(
+            "a, button, input, select, textarea, [role='button'], [role='link']",
+          )
+        ) {
+          return;
+        }
+        navigate();
+      },
+      { signal },
+    );
+
+    slide.addEventListener(
+      "keydown",
+      (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate();
+        }
+      },
+      { signal },
+    );
+  });
+}
+
+/**
+ * Destroy all Swiper instances and clear the maps.
+ */
+function destroyAll(): void {
+  slideControllers.forEach((ac) => ac.abort());
+  slideControllers.clear();
+  instances.forEach((swiper) => {
+    swiper.destroy(true, true);
+  });
+  instances.clear();
+}
+
+// --- Initialization ---
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeSliders);
+} else {
+  initializeSliders();
+}
+
+// On bfcache restore (back/forward navigation on desktop), the entire JS heap
+// is preserved — instances Map, Swiper objects, and DOM event listeners all
+// survive the freeze intact. DOMContentLoaded does NOT re-fire, but we do not
+// need to destroy/reinitialize. We only need to restart autoplay (setInterval
+// timers are paused during the freeze) and recalculate layout in case the
+// viewport changed. Destroying and reinitializing would strip inline styles
+// (background-image etc.) and cause a visible flash.
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted) {
+    instances.forEach((swiper) => {
+      swiper.update();
+      if (swiper.params.autoplay) {
+        swiper.autoplay.start();
+      }
+    });
+  }
+});
+
+// Re-initialize for AJAX / dynamic content
+document.addEventListener("DOMContentLoaded", () => {
+  // jQuery AJAX support for legacy themes
+  if (typeof jQuery !== "undefined") {
+    jQuery(document).on("ajaxComplete", (_event: any, xhr: any) => {
+      if (xhr?.responseText?.includes("sliderberg-swiper")) {
+        setTimeout(initializeSliders, 150);
+      }
+    });
+  }
+  // Custom theme event
+  document.addEventListener("content-updated", () =>
+    setTimeout(initializeSliders, 150),
+  );
+});
+
+// --- Public API ---
+
 window.SliderBerg = {
-	// Initialization
-	init: initializeSliders,
-	destroyAll: SliderBergController.destroyAll,
-
-	// Instance access
-	getInstance: SliderBergController.getInstance,
-	getInstances: () => SliderBergController.getInstances(),
-
-	// Convenience methods (operate on element directly)
-	goTo: ( element: Element, index: number ) => {
-		SliderBergController.getInstance( element )?.goTo( index );
-	},
-	next: ( element: Element ) => {
-		SliderBergController.getInstance( element )?.next();
-	},
-	prev: ( element: Element ) => {
-		SliderBergController.getInstance( element )?.prev();
-	},
-	pause: ( element: Element ) => {
-		SliderBergController.getInstance( element )?.pause();
-	},
-	play: ( element: Element ) => {
-		SliderBergController.getInstance( element )?.play();
-	},
-
-	// Extensibility
-	EffectRegistry,
-	BaseEffect,
+  init: initializeSliders,
+  destroyAll,
+  getInstance: (element: Element) => instances.get(element),
+  getInstances: () => instances,
+  next: (element: Element) => instances.get(element)?.slideNext(),
+  prev: (element: Element) => instances.get(element)?.slidePrev(),
+  goTo: (element: Element, index: number) =>
+    instances.get(element)?.slideTo(index),
+  pause: (element: Element) => instances.get(element)?.autoplay?.stop(),
+  play: (element: Element) => instances.get(element)?.autoplay?.start(),
 };

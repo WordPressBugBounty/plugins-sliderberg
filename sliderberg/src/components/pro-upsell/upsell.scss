@@ -1,0 +1,317 @@
+// LockedControl styles
+.sliderberg-locked-root {
+	position: relative;
+	grid-column: 1 / -1;
+}
+
+.sliderberg-locked-children {
+	opacity: 0.5;
+	pointer-events: none;
+	user-select: none;
+	filter: grayscale( 30% );
+}
+
+.sliderberg-lock-overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	padding-right: 8px;
+	cursor: pointer;
+	background: transparent;
+	border: none;
+	z-index: 1;
+
+	&:hover .sliderberg-lock-badge {
+		background: #4a90e2;
+		color: #fff;
+
+		svg,
+		.sliderberg-lock-badge-text {
+			fill: #ffffff;
+			color: #ffffff;
+		}
+	}
+
+	&:focus {
+		outline: none;
+		box-shadow: none;
+	}
+}
+
+.sliderberg-lock-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 10px 4px 6px;
+	background: #eef4fc;
+	border-radius: 4px;
+	transition:
+		background 0.15s ease,
+		color 0.15s ease;
+
+	svg {
+		width: 16px;
+		height: 16px;
+		fill: #357abd;
+		transition: fill 0.15s ease;
+	}
+}
+
+.sliderberg-lock-badge-text {
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	color: #357abd;
+}
+
+// UpsellModal styles
+.sliderberg-upsell-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 100001;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.sliderberg-upsell-modal-backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba( 0, 0, 0, 0.55 );
+}
+
+.sliderberg-upsell-modal-outer {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	animation: sliderberg-modal-enter 0.2s ease-out;
+}
+
+.sliderberg-upsell-modal-container {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow:
+		0 20px 60px rgba( 0, 0, 0, 0.2 ),
+		0 0 0 1px rgba( 0, 0, 0, 0.05 );
+	max-width: 500px;
+	width: 90vw;
+	overflow: hidden;
+}
+
+@keyframes sliderberg-modal-enter {
+	from {
+		opacity: 0;
+		transform: scale( 0.95 ) translateY( 10px );
+	}
+	to {
+		opacity: 1;
+		transform: scale( 1 ) translateY( 0 );
+	}
+}
+
+// Colored header bar
+.sliderberg-upsell-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 14px 20px;
+	background: linear-gradient( 135deg, #4a90e2 0%, #357abd 100% );
+	color: #fff;
+
+	svg {
+		stroke: #fff;
+
+		rect {
+			stroke: #fff;
+		}
+	}
+}
+
+.sliderberg-upsell-modal-header-icon {
+	display: flex;
+	align-items: center;
+}
+
+.sliderberg-upsell-modal-header-title {
+	font-size: 16px;
+	font-weight: 600;
+	letter-spacing: 0.3px;
+}
+
+// Slide wrapper & animation
+.sliderberg-upsell-slide-wrapper {
+	overflow: hidden;
+	position: relative;
+}
+
+.sliderberg-upsell-slide {
+	padding: 24px 24px 4px;
+}
+
+.sliderberg-upsell-modal-image {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	height: auto;
+	max-height: 220px;
+	object-fit: cover;
+	object-position: center top;
+	border-radius: 6px;
+	margin-bottom: 8px;
+}
+
+.sliderberg-upsell-slide.slide-left {
+	animation: sliderberg-slide-from-left 0.3s ease-out;
+}
+
+@keyframes sliderberg-slide-from-left {
+	from {
+		opacity: 0;
+		transform: translateX( -30px );
+	}
+	to {
+		opacity: 1;
+		transform: translateX( 0 );
+	}
+}
+
+.sliderberg-upsell-slide.slide-right {
+	animation: sliderberg-slide-from-right 0.3s ease-out;
+}
+
+@keyframes sliderberg-slide-from-right {
+	from {
+		opacity: 0;
+		transform: translateX( 30px );
+	}
+	to {
+		opacity: 1;
+		transform: translateX( 0 );
+	}
+}
+
+// Nav arrows
+.sliderberg-upsell-nav {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	background: rgba( 255, 255, 255, 0.9 );
+	border: none;
+	border-radius: 50%;
+	color: #4a90e2;
+	cursor: pointer;
+	transition:
+		background 0.15s ease,
+		transform 0.15s ease,
+		box-shadow 0.15s ease;
+	flex-shrink: 0;
+	box-shadow: 0 2px 8px rgba( 0, 0, 0, 0.12 );
+
+	&:hover {
+		background: #fff;
+		transform: scale( 1.1 );
+		box-shadow: 0 4px 16px rgba( 0, 0, 0, 0.18 );
+	}
+
+	&:focus {
+		outline: none;
+		box-shadow: 0 0 0 2px #4a90e2;
+	}
+
+	svg {
+		pointer-events: none;
+	}
+}
+
+.sliderberg-upsell-modal-description {
+	font-size: 18px;
+	color: #4b5563;
+	margin: 0 0 16px 0;
+	line-height: 1.65;
+	text-align: center;
+
+	strong {
+		color: #1e1e1e;
+	}
+}
+
+.sliderberg-upsell-promo {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 10px 14px;
+	background: #eef4fc;
+	border: 1px dashed #357abd;
+	border-radius: 6px;
+	margin-bottom: 16px;
+	font-size: 13px;
+	color: #374151;
+
+	code {
+		font-weight: 700 !important;
+		background: #4a90e2 !important;
+		color: #fff !important;
+		padding: 2px 10px !important;
+		border-radius: 4px !important;
+		letter-spacing: 0.5px !important;
+		font-family: monospace !important;
+	}
+}
+
+.sliderberg-upsell-modal-footer {
+	display: flex;
+	gap: 12px;
+	justify-content: space-between;
+	padding: 16px 24px 20px;
+	border-top: 1px solid #e5e7eb;
+}
+
+.sliderberg-upsell-modal-cancel {
+	padding: 10px 20px;
+	background: transparent;
+	border: 1px solid #d0d5dd;
+	border-radius: 6px;
+	color: #374151;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition:
+		background 0.15s ease,
+		border-color 0.15s ease;
+
+	&:hover {
+		background: #f3f4f6;
+		border-color: #9ca3af;
+	}
+}
+
+.sliderberg-upsell-modal-cta {
+	display: inline-flex;
+	align-items: center;
+	padding: 10px 24px;
+	background: #4a90e2;
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	transition:
+		background 0.15s ease,
+		box-shadow 0.15s ease;
+
+	&:hover {
+		background: #357abd;
+		box-shadow: 0 2px 8px rgba( 74, 144, 226, 0.3 );
+		color: #fff;
+	}
+}

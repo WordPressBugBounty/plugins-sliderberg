@@ -1,0 +1,92 @@
+/**
+ * Slider block editor-only styles.
+ * These only load inside the WordPress block editor.
+ */
+
+.sliderberg-editor-wrapper {
+  .sliderberg-swiper-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  .sliderberg-swiper-editor {
+    position: relative;
+    width: 100%;
+  }
+
+  // Slides in editor
+  .swiper-slide {
+    min-height: var(--sliderberg-min-height, 400px);
+    height: auto;
+
+    // Ensure inner blocks are interactive in editor
+    > * {
+      pointer-events: all;
+    }
+  }
+
+  // Vertical mode: rotate arrow icons
+  &.sliderberg-vertical {
+    .swiper-button-prev::after,
+    .swiper-button-next::after {
+      transform: rotate(90deg);
+    }
+  }
+
+  // Visual hint: show a subtle border around slides in editor for clarity
+  .sliderberg-slide-editor {
+    outline: 1px dashed rgba(0, 0, 0, 0.1);
+    outline-offset: -1px;
+    transition: outline-color 0.15s ease;
+
+    &.is-selected,
+    &:focus-within {
+      outline-color: var(--wp-admin-theme-color, #007cba);
+      outline-style: solid;
+    }
+  }
+}
+
+// --- Layout chooser (shown before a mode is picked) ---
+.sliderberg-layout-chooser {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+
+  &__option {
+    flex: 1;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: auto !important;
+    padding: 20px 16px !important;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    // Override the tertiary Button's default link-blue with a neutral color.
+    color: #1e1e1e;
+
+    &:hover,
+    &:focus {
+      border-color: var(--wp-admin-theme-color, #007cba);
+    }
+  }
+
+  &__title {
+    font-weight: 600;
+    color: #1e1e1e;
+  }
+
+  &__description {
+    font-size: 12px;
+    color: #757575;
+  }
+}
+
+.sliderberg-layout-chooser__hint {
+  margin-top: 12px;
+  margin-bottom: 0;
+  font-size: 12px;
+  color: #757575;
+  text-align: center;
+}

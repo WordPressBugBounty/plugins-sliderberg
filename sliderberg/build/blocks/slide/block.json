@@ -6,7 +6,7 @@
   "title": "Slide",
   "category": "widgets",
   "icon": "cover-image",
-  "description": "A sophisticated slide with advanced background and content positioning options.",
+  "description": "A single slide within a slider or carousel.",
   "parent": [
     "sliderberg/sliderberg"
   ],

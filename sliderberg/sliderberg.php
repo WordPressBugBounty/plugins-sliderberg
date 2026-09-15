@@ -3,7 +3,7 @@
  * Plugin Name: Sliderberg
  * Plugin URI: https://sliderberg.com/
  * Description: Slider Block For the Block Editor (Gutenberg). Slide Anything With Ease.
- * Version: 1.2.2
+ * Version: 1.2.3
  * Author: DotCamp
  * Author URI: https://dotcamp.com/
  * License: GPL v2 or later
@@ -18,7 +18,7 @@ if (!defined('WPINC')) {
 }
 
 // Define plugin constants
-define( 'SLIDERBERG_VERSION', '1.2.2' );
+define( 'SLIDERBERG_VERSION', '1.2.3' );
 define('SLIDERBERG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SLIDERBERG_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -107,11 +107,16 @@ function sliderberg_init() {
         $style_version
     );
 
-    // Register editor-only styles after the shared styles.
+    // Register editor-only styles after the shared styles. 'dashicons' is
+    // included so it loads inside the block editor's iframe too — Gutenberg
+    // pulls in a registered editor style's dependencies there, and without
+    // it Dashicon-based block/variation icons (e.g. "format-image") render
+    // blank in the editor canvas even though they show fine in the admin's
+    // own UI (inserter popover, "Transform to" menu), which isn't iframed.
     wp_register_style(
         'sliderberg-editor',
         SLIDERBERG_PLUGIN_URL . 'build/index.css',
-        array( 'sliderberg-style' ),
+        array( 'sliderberg-style', 'dashicons' ),
         $editor_version
     );
 

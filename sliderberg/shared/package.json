@@ -1,0 +1,20 @@
+{
+     "name": "@sliderberg/shared",
+     "version": "1.0.8",
+     "description": "Shared utilities and components for Sliderberg Slider Block",
+     "author": "DotCamp",
+     "license": "GPL-2.0-or-later",
+     "main": "src/index.ts",
+     "peerDependencies": {
+          "@wordpress/block-editor": "^14.0.0",
+          "@wordpress/components": "^29.0.0",
+          "@wordpress/element": "^5.0.0",
+          "@wordpress/i18n": "^4.0.0"
+     },
+     "devDependencies": {
+          "@wordpress/scripts": "^30.26.0"
+     },
+     "dependencies": {
+          "@wordpress/icons": "^10.23.0"
+     }
+}
