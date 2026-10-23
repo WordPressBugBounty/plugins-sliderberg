@@ -1,4 +1,4 @@
-=== Slider Block by Sliderberg - WordPress Slider & Carousel Plugin for Gutenberg ===
+=== Slider Block by Sliderberg - Slider & Carousel Plugin for Block Editor ===
 Contributors: imtiazrayhan, dotcamp, farhanshafi
 Tags: slider, carousel, text slider, block, gutenberg
 Requires at least: 5.8
