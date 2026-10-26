@@ -60,7 +60,7 @@
 		z-index: 2;
 		width: 100%;
 		box-sizing: border-box;
-		padding: 20px;
+		// padding comes from slider/style.scss (per-device slide padding)
 
 		// Ensure inner block text is readable over dark backgrounds
 		.block-editor-rich-text__editable:empty::before {

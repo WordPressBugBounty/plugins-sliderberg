@@ -55,6 +55,21 @@
       "type": "number",
       "default": 400
     },
+    "tabletMinHeight": {
+      "type": "number"
+    },
+    "mobileMinHeight": {
+      "type": "number"
+    },
+    "contentPadding": {
+      "type": "object"
+    },
+    "tabletContentPadding": {
+      "type": "object"
+    },
+    "mobileContentPadding": {
+      "type": "object"
+    },
     "contentPosition": {
       "type": "string",
       "default": "center-center"

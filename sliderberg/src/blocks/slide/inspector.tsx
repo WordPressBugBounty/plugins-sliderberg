@@ -18,6 +18,8 @@ import {
   BorderControlWithToolsPanel,
 } from "@sliderberg/shared";
 import type { SlideAttributes } from "./constants";
+import ResponsiveMinHeightControl from "../../components/responsive-min-height-control";
+import ResponsivePaddingControl from "../../components/responsive-padding-control";
 
 interface SlideInspectorProps {
   attributes: SlideAttributes;
@@ -28,7 +30,14 @@ export default function SlideInspector({
   attributes,
   setAttributes,
 }: SlideInspectorProps) {
-  const { overlayOpacity, minHeight, slideLink, slideLinkNewTab } = attributes;
+  const {
+    overlayOpacity,
+    minHeight,
+    tabletMinHeight,
+    mobileMinHeight,
+    slideLink,
+    slideLinkNewTab,
+  } = attributes;
 
   return (
     <>
@@ -64,6 +73,20 @@ export default function SlideInspector({
           />
         </PanelBody>
       </InspectorControls>
+      <ResponsivePaddingControl
+        label={__("Padding", "sliderberg")}
+        attrKeys={{
+          desktop: "contentPadding",
+          tablet: "tabletContentPadding",
+          mobile: "mobileContentPadding",
+        }}
+        attributes={attributes}
+        setAttributes={setAttributes}
+        desktopHelp={__(
+          "Space around this slide's content. Empty sides use the slider's Slide Padding.",
+          "sliderberg",
+        )}
+      />
       <InspectorControls group="border">
         <BorderControlWithToolsPanel
           showDefaultBorder
@@ -104,20 +127,21 @@ export default function SlideInspector({
           title={__("Layout Settings", "sliderberg")}
           initialOpen={false}
         >
-          <RangeControl
-            __next40pxDefaultSize
-            value={minHeight}
-            allowReset
-            resetFallbackValue={400}
-            label={__("Minimum Height", "sliderberg")}
-            onChange={(value) =>
+          <ResponsiveMinHeightControl
+            desktop={minHeight}
+            tablet={tabletMinHeight}
+            mobile={mobileMinHeight}
+            desktopDefault={400}
+            desktopHelp={__(
+              "Makes this slide taller than the slider's minimum height.",
+              "sliderberg",
+            )}
+            onChange={(device, value) =>
               setAttributes({
-                minHeight: value ?? 400,
+                [device === "desktop" ? "minHeight" : `${device}MinHeight`]:
+                  value,
               })
             }
-            min={100}
-            max={1000}
-            step={10}
           />
         </PanelBody>
       </InspectorControls>

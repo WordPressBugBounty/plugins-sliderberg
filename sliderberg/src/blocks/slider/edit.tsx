@@ -28,20 +28,9 @@ import SliderInspector from "./inspector";
 import LayoutChooser from "./layout-chooser";
 import { buildSwiperConfig } from "./constants";
 import type { SliderAttributes } from "./constants";
+import { getSlidePaddingVars, spacingValueToCSS } from "./slide-padding";
 
 import "./editor.scss";
-
-/**
- * Convert a WordPress spacing value to a CSS value.
- * Handles preset format: "var:preset|spacing|30" → "var(--wp--preset--spacing--30)"
- * and plain values like "20px".
- */
-function spacingValueToCSS(value: string): string {
-  if (value.startsWith("var:")) {
-    return `var(--wp--preset--spacing--${value.split("|").pop()})`;
-  }
-  return value;
-}
 
 function getEditorBreakpointParams(
   config: ReturnType<typeof buildSwiperConfig>,
@@ -200,6 +189,8 @@ export default function Edit({
   const {
     mode,
     minHeight,
+    tabletMinHeight,
+    mobileMinHeight,
     widthPreset,
     customWidth,
     widthUnit,
@@ -316,6 +307,10 @@ export default function Edit({
     delete config.flipEffect;
     delete config.cubeEffect;
     delete config.parallax;
+    // autoHeight only measures on slide change, and the editor's Swiper
+    // doesn't observe DOM changes, so slides would clip while typing. The
+    // sliderberg-unequal-height class gives the same layout instead.
+    delete config.autoHeight;
     // Disable all drag/swipe interaction in editor so mouse events are not
     // intercepted by Swiper — this allows Gutenberg to handle block selection.
     config.allowTouchMove = false;
@@ -457,7 +452,9 @@ export default function Edit({
         );
       }
     };
-  }, [swiperConfigKey, hideNavigation, hideDots]);
+    // effectiveMode: the Swiper container only exists once a layout is
+    // picked, so a fresh block must init when the chooser goes away.
+  }, [swiperConfigKey, hideNavigation, hideDots, effectiveMode]);
 
   useEffect(() => {
     if (!swiperInstanceRef.current) {
@@ -494,7 +491,18 @@ export default function Edit({
     "--swiper-pagination-color": dotActiveColor,
     "--swiper-pagination-bullet-inactive-color": dotColor,
     "--swiper-pagination-bullet-inactive-opacity": "1",
-    "--sliderberg-min-height": `${minHeight}px`,
+    "--sliderberg-min-height-desktop": `${minHeight}px`,
+    ...getSlidePaddingVars({
+      desktop: attributes.slidePadding,
+      tablet: attributes.tabletSlidePadding,
+      mobile: attributes.mobileSlidePadding,
+    }),
+    ...(tabletMinHeight
+      ? { "--sliderberg-min-height-tablet": `${tabletMinHeight}px` }
+      : {}),
+    ...(mobileMinHeight
+      ? { "--sliderberg-min-height-mobile": `${mobileMinHeight}px` }
+      : {}),
     "--sliderberg-easing": transitionEasing,
     ...(navFreePosition
       ? {
@@ -536,6 +544,7 @@ export default function Edit({
           : `sliderberg-nav-h-${navHorizontal} sliderberg-nav-v-${navVertical} sliderberg-dots-h-${dotsHorizontal} sliderberg-dots-v-${dotsVertical}`,
         navOutside && !navFreePosition ? "sliderberg-nav-outside" : "",
         isVerticalDirection ? "sliderberg-vertical" : "",
+        attributes.equalHeight === false ? "sliderberg-unequal-height" : "",
       ],
       attributes,
     ) as string[]
@@ -610,7 +619,7 @@ export default function Edit({
           className="swiper sliderberg-swiper-editor"
           style={
             isVerticalDirection
-              ? { height: `${minHeight}px`, overflow: "hidden" }
+              ? { height: "var(--sliderberg-min-height, 400px)", overflow: "hidden" }
               : undefined
           }
         >

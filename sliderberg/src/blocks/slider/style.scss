@@ -3,7 +3,50 @@
  * These styles apply on both the frontend and inside the block editor.
  */
 
+$sliderberg-sides: top, right, bottom, left;
+
 .wp-block-sliderberg-sliderberg {
+  // Resolve the per-device minimum height (set inline as -desktop/-tablet/
+  // -mobile) into one variable everything else reads. Breakpoints match the
+  // carousel's responsive settings; an unset device inherits the next
+  // larger one.
+  --sliderberg-min-height: var(--sliderberg-min-height-desktop, 400px);
+
+  @media (max-width: 1023px) {
+    --sliderberg-min-height: var(
+      --sliderberg-min-height-tablet,
+      var(--sliderberg-min-height-desktop, 400px)
+    );
+  }
+
+  @media (max-width: 767px) {
+    --sliderberg-min-height: var(
+      --sliderberg-min-height-mobile,
+      var(
+        --sliderberg-min-height-tablet,
+        var(--sliderberg-min-height-desktop, 400px)
+      )
+    );
+  }
+
+  // Slide padding for all slides, per side: the renderer outputs one
+  // variable per side and device (always all twelve); pick the device's.
+  @each $side in $sliderberg-sides {
+    --sliderberg-slide-padding-#{$side}: var(--sliderberg-slide-padding-#{$side}-desktop, 20px);
+  }
+
+  @media (max-width: 1023px) {
+    @each $side in $sliderberg-sides {
+      --sliderberg-slide-padding-#{$side}: var(--sliderberg-slide-padding-#{$side}-tablet, 20px);
+    }
+  }
+
+  @media (max-width: 767px) {
+    @each $side in $sliderberg-sides {
+      --sliderberg-slide-padding-#{$side}: var(--sliderberg-slide-padding-#{$side}-mobile, 20px);
+    }
+  }
+
   .sliderberg-swiper-wrap {
     position: relative;
     width: 100%;
@@ -20,6 +63,13 @@
   // Swiper wrapper needs full height
   .swiper-wrapper {
     align-items: stretch;
+  }
+
+  // Equal height off: each slide keeps its own height. Frontend uses Swiper's
+  // autoHeight; the editor uses the class instead (see slider/edit.tsx).
+  .swiper-autoheight .swiper-wrapper,
+  &.sliderberg-unequal-height .swiper-wrapper {
+    align-items: flex-start;
   }
 
   // --- Navigation Buttons ---
@@ -378,6 +428,32 @@
     height: auto; // Let content / min-height control height
   }
 
+  // The wrapper stretches every slide to the tallest one (e.g. in a
+  // carousel); make the content area fill that height too, so backgrounds
+  // inside it and the vertical Content Position reach the slide's bottom.
+  //
+  // Height: the slider's per-device minimum is the floor; a slide's own
+  // per-device value (set inline as -desktop/-tablet/-mobile, 0px when
+  // unset) can make it taller.
+  .sliderberg-slide,
+  .sliderberg-slide-editor {
+    --sliderberg-slide-min-height: var(--sliderberg-slide-min-height-desktop, 0px);
+    display: flex;
+    flex-direction: column;
+    min-height: max(
+      var(--sliderberg-min-height, 400px),
+      var(--sliderberg-slide-min-height)
+    );
+
+    @media (max-width: 1023px) {
+      --sliderberg-slide-min-height: var(--sliderberg-slide-min-height-tablet, 0px);
+    }
+
+    @media (max-width: 767px) {
+      --sliderberg-slide-min-height: var(--sliderberg-slide-min-height-mobile, 0px);
+    }
+  }
+
   // --- Slide internals (frontend) ---
   .sliderberg-slide {
     position: relative;
@@ -403,6 +479,38 @@
   .sliderberg-slide-content {
     position: relative;
     z-index: 2;
+    flex: 1 1 auto;
+    // A slide's own padding (inline own-padding variables, only for the
+    // sides/devices it sets) wins over the slider's. Reset them here first
+    // so a slider nested inside a slide never inherits that slide's values;
+    // the inline declarations on this element still override the reset.
+    @each $side in $sliderberg-sides {
+      @each $device in desktop, tablet, mobile {
+        --sliderberg-own-padding-#{$side}-#{$device}: initial;
+      }
+      padding-#{$side}: var(
+        --sliderberg-own-padding-#{$side}-desktop,
+        var(--sliderberg-slide-padding-#{$side}, 20px)
+      );
+    }
+
+    @media (max-width: 1023px) {
+      @each $side in $sliderberg-sides {
+        padding-#{$side}: var(
+          --sliderberg-own-padding-#{$side}-tablet,
+          var(--sliderberg-slide-padding-#{$side}, 20px)
+        );
+      }
+    }
+
+    @media (max-width: 767px) {
+      @each $side in $sliderberg-sides {
+        padding-#{$side}: var(
+          --sliderberg-own-padding-#{$side}-mobile,
+          var(--sliderberg-slide-padding-#{$side}, 20px)
+        );
+      }
+    }
     width: 100%;
     box-sizing: border-box;
   }

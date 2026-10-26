@@ -23,6 +23,42 @@ function sliderberg_register_slide_block() {
 }
 
 /**
+ * The slide's "Additional CSS class(es)", minus classes older plugin versions
+ * (and the welcome page's sample content) saved into className
+ * automatically: has-background, has-*-background-color, the block's own
+ * classes and the old content-position class. Those were never output on
+ * the frontend, and has-background in particular picks up theme padding, so
+ * printing them now would change how existing sliders look.
+ *
+ * @param array $attributes Slide block attributes.
+ * @return string Space-separated classes, or ''.
+ */
+function sliderberg_get_slide_custom_classes( $attributes ) {
+    if ( empty( $attributes['className'] ) || ! is_string( $attributes['className'] ) ) {
+        return '';
+    }
+
+    $classes = array();
+    foreach ( preg_split( '/\s+/', trim( $attributes['className'] ) ) as $class ) {
+        if (
+            'has-background' === $class ||
+            'wp-block-sliderberg-slide' === $class ||
+            'sliderberg-slide' === $class ||
+            preg_match( '/^has-[a-z0-9-]+-background-color$/', $class ) ||
+            0 === strpos( $class, 'sliderberg-content-position-' )
+        ) {
+            continue;
+        }
+        $class = sanitize_html_class( $class );
+        if ( '' !== $class ) {
+            $classes[] = $class;
+        }
+    }
+
+    return implode( ' ', array_unique( $classes ) );
+}
+
+/**
  * Render the slide block on the frontend.
  *
  * @param array    $attributes Block attributes.
@@ -31,12 +67,13 @@ function sliderberg_register_slide_block() {
  * @return string HTML output.
  */
 function render_sliderberg_slide_block( $attributes, $content, $block ) {
-    // The slider minimum height is the floor for every slide. A slide-specific
-    // value can make the slide taller, but cannot make it shorter than the
-    // parent slider and expose empty space below it.
-    $parent_min_height = isset( $block->context['sliderberg/minHeight'] ) ? absint( $block->context['sliderberg/minHeight'] ) : 400;
-    $slide_min_height  = isset( $attributes['minHeight'] ) ? absint( $attributes['minHeight'] ) : 400;
-    $effective_height  = ( $slide_min_height !== 400 ) ? max( $slide_min_height, $parent_min_height ) : $parent_min_height;
+    // The slider minimum height is the floor for every slide; a slide's own
+    // per-device value may make it taller (style.scss takes the larger of the
+    // two). 400 is the attribute default and means "no own value".
+    $slide_min_height   = isset( $attributes['minHeight'] ) ? absint( $attributes['minHeight'] ) : 400;
+    $own_desktop_height = ( 400 !== $slide_min_height ) ? $slide_min_height : 0;
+    $own_tablet_height  = isset( $attributes['tabletMinHeight'] ) ? absint( $attributes['tabletMinHeight'] ) : $own_desktop_height;
+    $own_mobile_height  = isset( $attributes['mobileMinHeight'] ) ? absint( $attributes['mobileMinHeight'] ) : $own_tablet_height;
     $transition_effect = isset( $block->context['sliderberg/transitionEffect'] ) ? $block->context['sliderberg/transitionEffect'] : 'slide';
     $is_parallax       = 'parallax' === $transition_effect;
 
@@ -117,7 +154,14 @@ function render_sliderberg_slide_block( $attributes, $content, $block ) {
     $base_slide_styles = array_merge(
         $border_styles,
         $radius_styles,
-        array( sprintf( 'min-height:%dpx', $effective_height ) )
+        array(
+            sprintf(
+                '--sliderberg-slide-min-height-desktop:%dpx;--sliderberg-slide-min-height-tablet:%dpx;--sliderberg-slide-min-height-mobile:%dpx',
+                $own_desktop_height,
+                $own_tablet_height,
+                $own_mobile_height
+            ),
+        )
     );
 
     if ( $is_parallax ) {
@@ -126,13 +170,26 @@ function render_sliderberg_slide_block( $attributes, $content, $block ) {
         $slide_style_str = implode( ';', array_merge( $bg_styles, $base_slide_styles ) );
     }
 
-    // Content styles
+    // Content styles. The content fills the slide's height via flex, and its
+    // padding comes from the slider (see slider/style.scss) except for the
+    // sides and devices this slide sets itself (own-padding variables).
     $content_style = sprintf(
-        'display:flex;flex-direction:column;align-items:%s;justify-content:%s;min-height:%dpx;padding:20px;width:100%%;box-sizing:border-box;',
+        'display:flex;flex-direction:column;align-items:%s;justify-content:%s;width:100%%;box-sizing:border-box;',
         $align_items,
-        $justify_content,
-        $effective_height
+        $justify_content
     );
+    $own_padding = sliderberg_resolve_responsive_padding(
+        array(
+            'desktop' => isset( $attributes['contentPadding'] ) ? $attributes['contentPadding'] : null,
+            'tablet'  => isset( $attributes['tabletContentPadding'] ) ? $attributes['tabletContentPadding'] : null,
+            'mobile'  => isset( $attributes['mobileContentPadding'] ) ? $attributes['mobileContentPadding'] : null,
+        )
+    );
+    foreach ( $own_padding as $device => $sides ) {
+        foreach ( $sides as $side => $value ) {
+            $content_style .= sprintf( '--sliderberg-own-padding-%s-%s:%s;', $side, $device, $value );
+        }
+    }
 
     // Overlay
     $overlay_html  = '';
@@ -172,9 +229,19 @@ function render_sliderberg_slide_block( $attributes, $content, $block ) {
         $slide_link_style = 'cursor:pointer;';
     }
 
-    // Build slide classes
+    // Build slide classes, including the "Additional CSS class(es)" the user
+    // set on the slide.
     $slide_classes = 'swiper-slide sliderberg-slide';
+    $custom_class  = sliderberg_get_slide_custom_classes( $attributes );
+    if ( '' !== $custom_class ) {
+        $slide_classes .= ' ' . $custom_class;
+    }
     $slide_classes = apply_filters( 'sliderberg_slide_classes', $slide_classes, $attributes );
+
+    // HTML anchor (block supports "anchor").
+    if ( ! empty( $attributes['anchor'] ) ) {
+        $slide_link_attrs = sprintf( ' id="%s"', esc_attr( $attributes['anchor'] ) ) . $slide_link_attrs;
+    }
 
     $content_parallax_attr = $is_parallax ? ' data-swiper-parallax="-100"' : '';
 

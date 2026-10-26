@@ -25,6 +25,8 @@ import type { SliderAttributes } from "./constants";
 import { isTransitionEffectAllowedInCarousel } from "./swiper-effects";
 import { deriveMutedColor } from "./color-utils";
 import { LockedControl } from "../../components/pro-upsell";
+import ResponsiveMinHeightControl from "../../components/responsive-min-height-control";
+import ResponsivePaddingControl from "../../components/responsive-padding-control";
 
 const isPro: boolean = window.sliderbergData?.isPro ?? false;
 
@@ -959,6 +961,20 @@ export default function SliderInspector({
 
   return (
     <>
+      <ResponsivePaddingControl
+        label={__("Slide Padding", "sliderberg")}
+        attrKeys={{
+          desktop: "slidePadding",
+          tablet: "tabletSlidePadding",
+          mobile: "mobileSlidePadding",
+        }}
+        attributes={attributes}
+        setAttributes={setAttributes}
+        desktopHelp={__(
+          "Space around the content of every slide. Default is 20px. Each slide can override it.",
+          "sliderberg",
+        )}
+      />
       <InspectorControls group="color">
         <ColorSettingsWithToolsPanel
           attrKey="navigationColor"
@@ -1021,23 +1037,38 @@ export default function SliderInspector({
           title={__("Layout Settings", "sliderberg")}
           initialOpen={false}
         >
-          <RangeControl
-            __next40pxDefaultSize
-            label={__("Minimum Height", "sliderberg")}
-            help={__(
-              "Minimum height for all slides. Individual slides can be taller.",
+          <ToggleControl
+            __nextHasNoMarginBottom
+            label={__("Equal Slide Height", "sliderberg")}
+            help={
+              attributes.equalHeight
+                ? __(
+                    "Every slide is as tall as the tallest slide.",
+                    "sliderberg",
+                  )
+                : __(
+                    "Each slide keeps its own height; the slider resizes to the current slide.",
+                    "sliderberg",
+                  )
+            }
+            checked={attributes.equalHeight}
+            onChange={(value) => setAttributes({ equalHeight: value })}
+          />
+          <ResponsiveMinHeightControl
+            desktop={attributes.minHeight}
+            tablet={attributes.tabletMinHeight}
+            mobile={attributes.mobileMinHeight}
+            desktopDefault={400}
+            desktopHelp={__(
+              "Minimum height for all slides. Slides grow taller to fit their content.",
               "sliderberg",
             )}
-            value={attributes.minHeight}
-            resetFallbackValue={400}
-            onChange={(value) =>
+            onChange={(device, value) =>
               setAttributes({
-                minHeight: value ?? 400,
+                [device === "desktop" ? "minHeight" : `${device}MinHeight`]:
+                  value,
               })
             }
-            min={100}
-            max={1000}
-            step={10}
           />
           {
             applyFilters(

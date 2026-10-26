@@ -3,7 +3,7 @@ Contributors: imtiazrayhan, dotcamp, farhanshafi
 Tags: slider, carousel, text slider, block, gutenberg
 Requires at least: 5.8
 Tested up to: 7.1
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,16 @@ Yes, carousel mode fully supports infinite loop scrolling, allowing your content
 8. Testimonials Slider
 
 == Changelog ==
+
+= 1.2.4 =
+
+* NEW: Equal Slide Height setting on the slider, on by default; turn it off to let each slide keep its own height.
+* NEW: Minimum Height on the slider and on each slide can now be set separately for desktop, tablet, and mobile.
+* NEW: Slide Padding in the slider's Dimensions panel sets the padding of every slide per device, and each slide can override it per device.
+* FIX: Slide content now fills the whole slide, so backgrounds inside it and Content Position reach the bottom when slides are stretched to the tallest one.
+* FIX: Slide content padding is no longer stuck at 20px.
+* FIX: A slide's Additional CSS class and HTML anchor now show up on the frontend.
+* Updated Freemius SDK to the latest version.
 
 = 1.2.3 =
 

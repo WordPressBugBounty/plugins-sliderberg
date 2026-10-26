@@ -20,8 +20,11 @@ import { useSelect } from "@wordpress/data";
 import { __ } from "@wordpress/i18n";
 
 import SlideInspector from "./inspector";
-import SlidePlaceholder from "./components/SlidePlaceholder";
+import SlidePlaceholder, {
+  SLIDE_MIN_HEIGHT,
+} from "./components/SlidePlaceholder";
 import type { ContentPosition, SlideAttributes } from "./constants";
+import { getOwnPaddingVars } from "../slider/slide-padding";
 
 import "./editor.scss";
 
@@ -43,7 +46,6 @@ export default function Edit({
   attributes,
   setAttributes,
   clientId,
-  context,
 }: EditProps) {
   const {
     backgroundImage,
@@ -55,6 +57,8 @@ export default function Edit({
     contentPosition,
     isFixed,
     minHeight: slideMinHeight,
+    tabletMinHeight,
+    mobileMinHeight,
     border,
     slideBorderRadius,
   } = attributes;
@@ -89,14 +93,17 @@ export default function Edit({
     </BlockControls>
   );
 
-  const parentMinHeight = context["sliderberg/minHeight"] || 400;
-  // The slider minimum height is the floor for every slide. A slide-specific
-  // value may make that slide taller, but must not leave it shorter than the
-  // Swiper container and expose empty space below it.
-  const effectiveMinHeight =
-    slideMinHeight !== 400
-      ? Math.max(slideMinHeight, parentMinHeight)
-      : parentMinHeight;
+  // The slider minimum height is the floor for every slide; a slide's own
+  // per-device value may make it taller (style.scss takes the larger of the
+  // two). 400 is the attribute default and means "no own value".
+  const ownDesktopHeight = slideMinHeight !== 400 ? slideMinHeight : 0;
+  const ownTabletHeight = tabletMinHeight ?? ownDesktopHeight;
+  const ownMobileHeight = mobileMinHeight ?? ownTabletHeight;
+  const slideHeightVars = {
+    "--sliderberg-slide-min-height-desktop": `${ownDesktopHeight}px`,
+    "--sliderberg-slide-min-height-tablet": `${ownTabletHeight}px`,
+    "--sliderberg-slide-min-height-mobile": `${ownMobileHeight}px`,
+  } as CSSProperties;
 
   // In Carousel mode several empty slides can be visible in the canvas at
   // once — showing each one's full upload/media-library/color placeholder
@@ -230,7 +237,7 @@ export default function Edit({
       ...backgroundStyle,
       ...borderStyle,
       ...radiusStyle,
-      minHeight: `${effectiveMinHeight}px`,
+      ...slideHeightVars,
     },
   });
 
@@ -242,7 +249,13 @@ export default function Edit({
         flexDirection: "column",
         alignItems,
         justifyContent,
-        minHeight: `${effectiveMinHeight}px`,
+        // This slide's own per-device padding (slider/style.scss falls
+        // back to the slider's value for sides it doesn't set).
+        ...getOwnPaddingVars({
+          desktop: attributes.contentPadding,
+          tablet: attributes.tabletContentPadding,
+          mobile: attributes.mobileContentPadding,
+        }),
       },
     },
     {
@@ -273,7 +286,7 @@ export default function Edit({
           backgroundColor={backgroundColor}
           border={border || {}}
           slideBorderRadius={slideBorderRadius || {}}
-          minHeight={effectiveMinHeight}
+          minHeight={SLIDE_MIN_HEIGHT}
           onUpdate={setAttributes}
           collapsed={!showFullPlaceholder}
         />

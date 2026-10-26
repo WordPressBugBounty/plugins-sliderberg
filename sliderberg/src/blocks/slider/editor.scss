@@ -14,9 +14,9 @@
     width: 100%;
   }
 
-  // Slides in editor
+  // Slides in editor (min-height comes from style.scss, shared with the
+  // frontend, so per-slide and per-device values apply here too)
   .swiper-slide {
-    min-height: var(--sliderberg-min-height, 400px);
     height: auto;
 
     // Ensure inner blocks are interactive in editor

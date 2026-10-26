@@ -244,7 +244,82 @@ function sliderberg_build_swiper_config( $attrs, $content = '' ) {
         $config['direction'] = 'vertical';
     }
 
+    // With equal height off, slides keep their own heights and the slider
+    // resizes to the active slide. (Swiper's autoHeight is horizontal-only.)
+    if ( isset( $attrs['equalHeight'] ) && false === $attrs['equalHeight'] && 'vertical' !== $direction ) {
+        $config['autoHeight'] = true;
+    }
+
     return apply_filters( 'sliderberg_swiper_config', $config, $attrs );
+}
+
+/**
+ * Convert a WP spacing value ("var:preset|spacing|50" or "24px") to CSS.
+ * Returns '' for anything that isn't a preset or a plain length, so
+ * attribute values can't inject other CSS.
+ *
+ * @param string $value Spacing value.
+ * @return string CSS value, or '' if invalid.
+ */
+function sliderberg_spacing_value_to_css( $value ) {
+    $value = trim( (string) $value );
+    if ( 0 === strpos( $value, 'var:' ) ) {
+        $parts = explode( '|', $value );
+        return sprintf( 'var(--wp--preset--spacing--%s)', sanitize_html_class( end( $parts ) ) );
+    }
+    return preg_match( '/^-?\d*\.?\d+[a-z%]*$/i', $value ) ? $value : '';
+}
+
+/**
+ * Resolve per-device padding so a side left empty on tablet/mobile inherits
+ * the next larger device. Sides that end up empty everywhere stay unset.
+ *
+ * @param array $padding { desktop, tablet, mobile } each { top, right, bottom, left }.
+ * @return array Device => side => CSS value.
+ */
+function sliderberg_resolve_responsive_padding( $padding ) {
+    $resolved = array();
+    $previous = array();
+    foreach ( array( 'desktop', 'tablet', 'mobile' ) as $device ) {
+        $current = $previous;
+        $values  = isset( $padding[ $device ] ) && is_array( $padding[ $device ] ) ? $padding[ $device ] : array();
+        foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
+            $css = isset( $values[ $side ] ) ? sliderberg_spacing_value_to_css( $values[ $side ] ) : '';
+            if ( '' !== $css ) {
+                $current[ $side ] = $css;
+            }
+        }
+        $resolved[ $device ] = $current;
+        $previous            = $current;
+    }
+    return $resolved;
+}
+
+/**
+ * The slider's padding for all its slides, as one CSS custom property per
+ * side and device. Unset sides use the 20px default. All twelve are always
+ * output so a nested slider never inherits its parent slider's values.
+ * Mirrors getSlidePaddingVars() in src/blocks/slider/slide-padding.ts.
+ *
+ * @param array $attributes Slider block attributes.
+ * @return string CSS custom property declarations.
+ */
+function sliderberg_get_slide_padding_vars( $attributes ) {
+    $resolved = sliderberg_resolve_responsive_padding(
+        array(
+            'desktop' => isset( $attributes['slidePadding'] ) ? $attributes['slidePadding'] : null,
+            'tablet'  => isset( $attributes['tabletSlidePadding'] ) ? $attributes['tabletSlidePadding'] : null,
+            'mobile'  => isset( $attributes['mobileSlidePadding'] ) ? $attributes['mobileSlidePadding'] : null,
+        )
+    );
+
+    $vars = '';
+    foreach ( $resolved as $device => $sides ) {
+        foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
+            $vars .= sprintf( '--sliderberg-slide-padding-%s-%s:%s;', $side, $device, isset( $sides[ $side ] ) ? $sides[ $side ] : '20px' );
+        }
+    }
+    return $vars;
 }
 
 /**
@@ -312,7 +387,7 @@ function render_sliderberg_slider_block( $attributes, $content ) {
 
     // CSS custom properties for theming
     $css_vars = sprintf(
-        '--swiper-navigation-color:%s;--swiper-navigation-background-color:%s;--sliderberg-nav-opacity:%s;--swiper-pagination-color:%s;--swiper-pagination-bullet-inactive-color:%s;--swiper-pagination-bullet-inactive-opacity:1;--sliderberg-min-height:%dpx;--sliderberg-easing:%s;',
+        '--swiper-navigation-color:%s;--swiper-navigation-background-color:%s;--sliderberg-nav-opacity:%s;--swiper-pagination-color:%s;--swiper-pagination-bullet-inactive-color:%s;--swiper-pagination-bullet-inactive-opacity:1;--sliderberg-min-height-desktop:%dpx;--sliderberg-easing:%s;',
         $nav_color,
         $nav_bg_color,
         $nav_opacity,
@@ -321,6 +396,17 @@ function render_sliderberg_slider_block( $attributes, $content ) {
         $min_height,
         $easing
     );
+
+    $css_vars .= sliderberg_get_slide_padding_vars( $attributes );
+
+    // Tablet/mobile min heights are optional; style.scss falls back to the
+    // next larger device's value when one isn't set.
+    if ( ! empty( $attributes['tabletMinHeight'] ) ) {
+        $css_vars .= sprintf( '--sliderberg-min-height-tablet:%dpx;', absint( $attributes['tabletMinHeight'] ) );
+    }
+    if ( ! empty( $attributes['mobileMinHeight'] ) ) {
+        $css_vars .= sprintf( '--sliderberg-min-height-mobile:%dpx;', absint( $attributes['mobileMinHeight'] ) );
+    }
 
     // Custom navigation size CSS variable
     if ( ! empty( $nav_size_value ) ) {
@@ -369,6 +455,10 @@ function render_sliderberg_slider_block( $attributes, $content ) {
                 $extra_classes .= ' sliderberg-nav-outside';
             }
         }
+    }
+
+    if ( isset( $attributes['equalHeight'] ) && false === $attributes['equalHeight'] ) {
+        $extra_classes .= ' sliderberg-unequal-height';
     }
 
     $extra_classes = apply_filters( 'sliderberg_slider_classes', $extra_classes, $attributes );

@@ -7,6 +7,7 @@ import type {
 	MediaObject,
 	ContentPosition,
 } from '../../types/common';
+import type { PaddingSides } from '../slider/slide-padding';
 
 export type { FocalPoint, MediaObject, ContentPosition };
 
@@ -22,6 +23,13 @@ export interface SlideAttributes {
 	overlayColor: string;
 	overlayOpacity: number;
 	minHeight: number;
+	/** Unset = inherit the next larger device's value. */
+	tabletMinHeight?: number;
+	mobileMinHeight?: number;
+	/** This slide's own padding per device; overrides the slider's per side. */
+	contentPadding?: PaddingSides;
+	tabletContentPadding?: PaddingSides;
+	mobileContentPadding?: PaddingSides;
 	contentPosition: ContentPosition;
 	isFixed: boolean;
 	// Deprecated border attrs (kept for backward compat)

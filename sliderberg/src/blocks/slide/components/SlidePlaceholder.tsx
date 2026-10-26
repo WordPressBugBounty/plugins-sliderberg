@@ -20,7 +20,8 @@ interface SlidePlaceholderProps {
 	backgroundColor: string | null;
 	border: Record< string, any >;
 	slideBorderRadius: Record< string, any >;
-	minHeight: number;
+	/** Any CSS length, e.g. "400px" or "var(--sliderberg-min-height)". */
+	minHeight: string;
 	onUpdate: ( attrs: Record< string, unknown > ) => void;
 	/**
 	 * When true, renders a minimal "+" prompt instead of the full
@@ -31,6 +32,10 @@ interface SlidePlaceholderProps {
 	 */
 	collapsed?: boolean;
 }
+
+/** The slide's resolved minimum height (vars are set in slider/style.scss). */
+export const SLIDE_MIN_HEIGHT =
+	'max(var(--sliderberg-min-height, 400px), var(--sliderberg-slide-min-height, 0px))';
 
 export default function SlidePlaceholder( {
 	clientId,
@@ -61,7 +66,7 @@ export default function SlidePlaceholder( {
 			) }
 			data-client-id={ clientId }
 			style={ {
-				minHeight: `${ minHeight }px`,
+				minHeight,
 				borderTop: borderInFourDimensions
 					? getSingleSideBorderValue( borderInFourDimensions, 'top' )
 					: undefined,

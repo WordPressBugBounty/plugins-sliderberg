@@ -3,7 +3,7 @@
  * Plugin Name: Sliderberg
  * Plugin URI: https://sliderberg.com/
  * Description: Slider Block For the Block Editor (Gutenberg). Slide Anything With Ease.
- * Version: 1.2.3
+ * Version: 1.2.4
  * Author: DotCamp
  * Author URI: https://dotcamp.com/
  * License: GPL v2 or later
@@ -18,7 +18,7 @@ if (!defined('WPINC')) {
 }
 
 // Define plugin constants
-define( 'SLIDERBERG_VERSION', '1.2.3' );
+define( 'SLIDERBERG_VERSION', '1.2.4' );
 define('SLIDERBERG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SLIDERBERG_PLUGIN_URL', plugin_dir_url(__FILE__));
 

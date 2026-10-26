@@ -66,6 +66,15 @@ export interface SliderAttributes {
   mobileSlidesToScroll: number;
   mobileSlideSpacing: number;
   minHeight: number;
+  /** Unset = inherit the next larger device's value. */
+  tabletMinHeight?: number;
+  mobileMinHeight?: number;
+  /** Stretch every slide to the tallest one; off = each slide keeps its own height. */
+  equalHeight: boolean;
+  /** Padding of every slide's content area; empty sides inherit (see slide-padding.ts). */
+  slidePadding?: { top?: string; right?: string; bottom?: string; left?: string };
+  tabletSlidePadding?: { top?: string; right?: string; bottom?: string; left?: string };
+  mobileSlidePadding?: { top?: string; right?: string; bottom?: string; left?: string };
   sliderDirection: string;
 }
 
@@ -168,6 +177,7 @@ export function buildSwiperConfig(attributes: SliderAttributes): SwiperOptions {
     mobileSlidesToScroll,
     mobileSlideSpacing,
     sliderDirection,
+    equalHeight,
   } = attributes;
 
   const isCarouselMode = mode === "carousel";
@@ -184,6 +194,12 @@ export function buildSwiperConfig(attributes: SliderAttributes): SwiperOptions {
       | "horizontal"
       | "vertical",
   };
+
+  // With equal height off, slides keep their own heights and the slider
+  // resizes to the active slide. (Swiper's autoHeight is horizontal-only.)
+  if (equalHeight === false && sliderDirection !== "vertical") {
+    config.autoHeight = true;
+  }
 
   // Autoplay
   if (autoplay) {

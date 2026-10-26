@@ -243,6 +243,25 @@
             "type": "number",
             "default": 400
         },
+        "tabletMinHeight": {
+            "type": "number"
+        },
+        "mobileMinHeight": {
+            "type": "number"
+        },
+        "equalHeight": {
+            "type": "boolean",
+            "default": true
+        },
+        "slidePadding": {
+            "type": "object"
+        },
+        "tabletSlidePadding": {
+            "type": "object"
+        },
+        "mobileSlidePadding": {
+            "type": "object"
+        },
         "sliderDirection": {
             "type": "string",
             "default": "horizontal"
