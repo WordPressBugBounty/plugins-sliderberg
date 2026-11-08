@@ -62,6 +62,14 @@
 		box-sizing: border-box;
 		// padding comes from slider/style.scss (per-device slide padding)
 
+		// Spectra's editor CSS forces its outer Container to full width (an
+		// ID selector, hence !important), but its frontend CSS doesn't, so on
+		// the frontend the Container shrinks to its content and Content
+		// Position places it. Match the frontend. Stretch Content still fills.
+		> .wp-block-uagb-container.uagb-is-root-container {
+			width: auto !important;
+		}
+
 		// Ensure inner block text is readable over dark backgrounds
 		.block-editor-rich-text__editable:empty::before {
 			opacity: 0.6;

@@ -1,9 +1,9 @@
-=== Slider Block by Sliderberg - Slider & Carousel Plugin for Block Editor ===
+=== Slider Block by Sliderberg - Slider & Carousel Plugin for Gutenberg ===
 Contributors: imtiazrayhan, dotcamp, farhanshafi
 Tags: slider, carousel, text slider, block, gutenberg
 Requires at least: 5.8
 Tested up to: 7.1
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,13 @@ Yes, carousel mode fully supports infinite loop scrolling, allowing your content
 8. Testimonials Slider
 
 == Changelog ==
+
+= 1.2.5 =
+
+* NEW: Stretch Content setting on each slide makes the blocks inside fill the whole slide, so a container's background or video covers it.
+* FIX: A new slider now works in the editor right after you pick a layout, with its arrows and dots showing.
+* FIX: The Cube effect (Pro) now follows Equal Slide Height and no longer cuts off slides taller than the others.
+* FIX: A Spectra Container inside a slide now has the same size in the editor as on the frontend.
 
 = 1.2.4 =
 

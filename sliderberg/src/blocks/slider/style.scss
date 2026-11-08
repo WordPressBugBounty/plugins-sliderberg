@@ -514,4 +514,15 @@ $sliderberg-sides: top, right, bottom, left;
     width: 100%;
     box-sizing: border-box;
   }
+
+  // Stretch Content (slide setting): blocks inside the slide fill it, e.g. a
+  // container whose background should cover the whole slide. Horizontal
+  // margins are reset so blocks that center themselves with auto margins
+  // still stretch. The editor's block appender keeps its own size.
+  .sliderberg-slide-stretch .sliderberg-slide-content > :not(.block-list-appender) {
+    flex-grow: 1;
+    align-self: stretch;
+    margin-left: 0;
+    margin-right: 0;
+  }
 }

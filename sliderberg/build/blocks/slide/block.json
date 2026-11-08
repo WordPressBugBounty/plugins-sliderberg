@@ -74,6 +74,10 @@
       "type": "string",
       "default": "center-center"
     },
+    "stretchContent": {
+      "type": "boolean",
+      "default": false
+    },
     "isFixed": {
       "type": "boolean",
       "default": false

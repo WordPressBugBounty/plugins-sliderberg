@@ -31,6 +31,8 @@ export interface SlideAttributes {
 	tabletContentPadding?: PaddingSides;
 	mobileContentPadding?: PaddingSides;
 	contentPosition: ContentPosition;
+	/** Blocks inside the slide grow to fill its full height and width. */
+	stretchContent: boolean;
 	isFixed: boolean;
 	// Deprecated border attrs (kept for backward compat)
 	borderWidth: number;

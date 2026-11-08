@@ -35,6 +35,7 @@ export default function SlideInspector({
     minHeight,
     tabletMinHeight,
     mobileMinHeight,
+    stretchContent,
     slideLink,
     slideLinkNewTab,
   } = attributes;
@@ -127,6 +128,15 @@ export default function SlideInspector({
           title={__("Layout Settings", "sliderberg")}
           initialOpen={false}
         >
+          <ToggleControl
+            label={__("Stretch Content", "sliderberg")}
+            checked={!!stretchContent}
+            onChange={(value) => setAttributes({ stretchContent: value })}
+            help={__(
+              "Blocks inside this slide fill its full height and width, so a container's background covers the whole slide. Works best with one block, such as a Group or Container; Content Position no longer applies.",
+              "sliderberg",
+            )}
+          />
           <ResponsiveMinHeightControl
             desktop={minHeight}
             tablet={tabletMinHeight}

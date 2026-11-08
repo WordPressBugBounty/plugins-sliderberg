@@ -232,7 +232,9 @@ export default function Edit({
   );
 
   const blockProps = useBlockProps({
-    className: "swiper-slide sliderberg-slide-editor",
+    className: `swiper-slide sliderberg-slide-editor${
+      attributes.stretchContent ? " sliderberg-slide-stretch" : ""
+    }`,
     style: {
       ...backgroundStyle,
       ...borderStyle,

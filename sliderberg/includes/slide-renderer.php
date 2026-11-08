@@ -232,6 +232,9 @@ function render_sliderberg_slide_block( $attributes, $content, $block ) {
     // Build slide classes, including the "Additional CSS class(es)" the user
     // set on the slide.
     $slide_classes = 'swiper-slide sliderberg-slide';
+    if ( ! empty( $attributes['stretchContent'] ) ) {
+        $slide_classes .= ' sliderberg-slide-stretch';
+    }
     $custom_class  = sliderberg_get_slide_custom_classes( $attributes );
     if ( '' !== $custom_class ) {
         $slide_classes .= ' ' . $custom_class;
